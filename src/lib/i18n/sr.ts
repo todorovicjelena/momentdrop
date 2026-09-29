@@ -164,7 +164,7 @@ export const sr = {
     coverHint: "Široka slika na vrhu stranice za goste.",
     background: "Puna pozadina",
     backgroundHint: "Zamenjuje MomentDrop dekor na stranici za goste vašom slikom.",
-    backgroundLocked: "Dostupno na Standard i Premium planu — bez MomentDrop dekora, samo vaša slika u pozadini.",
+    backgroundLocked: "Dostupno na Standard i Premium planu - bez MomentDrop dekora, samo vaša slika u pozadini.",
     chooseImage: "Izaberi sliku",
     replaceImage: "Zameni",
     removeImage: "Ukloni",
@@ -199,7 +199,7 @@ export const sr = {
       planName: { free: "Besplatan", premium: "Standard", deluxe: "Premium" },
       uploadsUsed: (n: number, max: number) => `${n} / ${max} fajlova iskorišćeno`,
       storageUntil: (date: string) => `Galerija dostupna do ${date}`,
-      upgradeButton: (planName: string, price: string) => `Nadogradi na ${planName} — ${price}`,
+      upgradeButton: (planName: string, price: string) => `Nadogradi na ${planName} - ${price}`,
       upgradeHint: "Jednokratno plaćanje po događaju, bez pretplate.",
     },
   },
@@ -357,7 +357,7 @@ export const sr = {
       },
       business: {
         name: "Poslovni",
-        subtitle: "Za firme, agencije i organizatore događaja — po upitu, prilagođeno vašem eventu.",
+        subtitle: "Za firme, agencije i organizatore događaja - po upitu, prilagođeno vašem eventu.",
         features: [
           "Prilagođen dizajn stranice za goste",
           "Montaža video zapisa sa događaja",
