@@ -22,12 +22,14 @@ export function BrandingUpload({
   const inputRef = useRef<HTMLInputElement>(null);
   const { previewUrl, uploading, progress, error, upload, remove } = useBrandingUpload(eventId, kind, initialUrl);
   const isLogo = kind === "logo";
+  const label = { logo: t.settings.logo, cover: t.settings.cover, background: t.settings.background }[kind];
+  const hint = { logo: t.settings.logoHint, cover: t.settings.coverHint, background: t.settings.backgroundHint }[kind];
 
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <p className="pl-1 text-sm font-semibold">{isLogo ? t.settings.logo : t.settings.cover}</p>
-        <p className="pl-1 text-xs text-muted-foreground">{isLogo ? t.settings.logoHint : t.settings.coverHint}</p>
+        <p className="pl-1 text-sm font-semibold">{label}</p>
+        <p className="pl-1 text-xs text-muted-foreground">{hint}</p>
       </div>
 
       <div className={cn("flex gap-4", isLogo ? "items-center" : "flex-col")}>

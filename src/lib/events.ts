@@ -51,6 +51,7 @@ export type EventSettings = EventRow & {
   welcome_message: string | null;
   logo_key: string | null;
   cover_key: string | null;
+  background_key: string | null;
   primary_color: string;
   upload_deadline: string | null;
   pin_hash: string | null;
@@ -60,12 +61,15 @@ export type EventSettings = EventRow & {
 export const BRAND_COLORS = ["#ff6a33", "#e2476b", "#9b7bd6", "#4d6bff", "#3f8f6a", "#1d1b24"] as const;
 export const COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
-// Logo & cover uploads (host only). Images are compressed in the browser first.
+// Logo, cover & full-page background uploads (host only). Images are
+// compressed in the browser first. Background replaces the default swirl
+// decoration on the guest page — paid plans only, see BRANDING.paidOnly.
 export const BRANDING = {
-  kinds: ["logo", "cover"] as const,
+  kinds: ["logo", "cover", "background"] as const,
+  paidOnly: ["background"] as const,
   mimeTypes: ["image/jpeg", "image/png", "image/webp"] as const,
   maxBytes: 5 * 1024 * 1024,
-  maxDimension: { logo: 600, cover: 2000 },
+  maxDimension: { logo: 600, cover: 2000, background: 2400 },
 };
 export type BrandingKind = (typeof BRANDING.kinds)[number];
 
@@ -111,7 +115,15 @@ export function localInputToIso(local: string, timeZone = EVENT_TIMEZONE) {
   return new Date(asUtc - offset).toISOString();
 }
 
-// Uploads close when the host switches them off or the deadline has passed.
-export function isUploadClosed(event: { uploads_open: boolean; upload_deadline: string | null }, now = new Date()) {
-  return !event.uploads_open || (event.upload_deadline !== null && new Date(event.upload_deadline) < now);
+// Uploads close when the host switches them off, the deadline has passed, or
+// the event's storage retention (tied to its plan) has expired.
+export function isUploadClosed(
+  event: { uploads_open: boolean; upload_deadline: string | null; storage_expires_at?: string | null },
+  now = new Date(),
+) {
+  return (
+    !event.uploads_open ||
+    (event.upload_deadline !== null && new Date(event.upload_deadline) < now) ||
+    (event.storage_expires_at != null && new Date(event.storage_expires_at) < now)
+  );
 }

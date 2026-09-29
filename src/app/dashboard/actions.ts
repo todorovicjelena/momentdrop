@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { EVENT_TYPES, SLUG_PATTERN, type EventType } from "@/lib/events";
+import { storageExpiresAt } from "@/lib/plans";
 import { t } from "@/lib/i18n";
 
 export type CreateEventState = { error?: string; field?: "title" | "slug" | "type"; suggestion?: string } | undefined;
@@ -53,7 +54,7 @@ export async function createEvent(_prev: CreateEventState, formData: FormData): 
   // owner_id defaults to auth.uid() in the database; RLS makes sure it's you.
   const { data: created, error } = await supabase
     .from("events")
-    .insert({ title, slug, event_type: eventType, event_date: eventDate })
+    .insert({ title, slug, event_type: eventType, event_date: eventDate, storage_expires_at: storageExpiresAt("free").toISOString() })
     .select("id")
     .single();
 

@@ -6,14 +6,15 @@ import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
 // Frame shared by all guest pages: host shortcut bar, the event's color,
-// swirl background, "Pošalji · Galerija" tabs and the brand footer.
+// swirl (or, on paid plans, a custom) background, "Pošalji · Galerija" tabs
+// and the brand footer.
 export function GuestShell({
   event,
   className,
   enter = "fade-in",
   children,
 }: {
-  event: Pick<PublicEvent, "slug" | "primary_color" | "guests_can_view">;
+  event: Pick<PublicEvent, "slug" | "primary_color" | "guests_can_view" | "background_url">;
   className?: string;
   // How the content animates in. The swirl background stays put, so only the
   // content moves — no flash of the page behind it. Pošalji slides in from the
@@ -29,7 +30,13 @@ export function GuestShell({
         // The host's color replaces the orange accents on guest pages.
         style={{ "--color-blaze": event.primary_color, "--primary": event.primary_color } as React.CSSProperties}
       >
-        <Swirls />
+        {event.background_url ? (
+          // Paid plans can replace the MomentDrop swirl look with their own image.
+          // eslint-disable-next-line @next/next/no-img-element -- presigned R2 URL
+          <img src={event.background_url} alt="" aria-hidden className="absolute inset-0 -z-10 size-full object-cover" />
+        ) : (
+          <Swirls />
+        )}
         <div className={cn("flex flex-1 flex-col animate-in duration-500 ease-out", enter, className)}>
           {event.guests_can_view && <GuestTabs slug={event.slug} />}
           {children}

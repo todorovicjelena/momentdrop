@@ -162,6 +162,9 @@ export const sr = {
     logoHint: "Kvadratna slika, npr. monogram. JPG, PNG ili WebP.",
     cover: "Naslovna slika",
     coverHint: "Široka slika na vrhu stranice za goste.",
+    background: "Puna pozadina",
+    backgroundHint: "Zamenjuje MomentDrop dekor na stranici za goste vašom slikom.",
+    backgroundLocked: "Dostupno na Standard i Premium planu — bez MomentDrop dekora, samo vaša slika u pozadini.",
     chooseImage: "Izaberi sliku",
     replaceImage: "Zameni",
     removeImage: "Ukloni",
@@ -188,6 +191,16 @@ export const sr = {
       imageSize: "Slika je prevelika (najviše 5 MB).",
       uploadFailed: "Slanje slike nije uspelo. Pokušajte ponovo.",
       notFound: "Događaj nije pronađen.",
+      checkoutFailed: "Plaćanje nije moglo da se pokrene. Pokušajte ponovo.",
+      paidPlanRequired: "Puna pozadina je dostupna na Standard i Premium planu.",
+    },
+    plan: {
+      title: "Plan",
+      planName: { free: "Besplatan", premium: "Standard", deluxe: "Premium" },
+      uploadsUsed: (n: number, max: number) => `${n} / ${max} fajlova iskorišćeno`,
+      storageUntil: (date: string) => `Galerija dostupna do ${date}`,
+      upgradeButton: (planName: string, price: string) => `Nadogradi na ${planName} — ${price}`,
+      upgradeHint: "Jednokratno plaćanje po događaju, bez pretplate.",
     },
   },
   gallery: {
@@ -264,6 +277,209 @@ export const sr = {
       invalidSlug: "Link može imati 3–60 karaktera: mala slova, brojeve i crtice.",
       slugTaken: "Ovaj link je zauzet. Probajte drugi.",
       generic: "Događaj nije sačuvan. Pokušajte ponovo.",
+    },
+  },
+  marketing: {
+    nav: {
+      howItWorks: "Kako funkcioniše",
+      pricing: "Cenovnik",
+      faq: "Pitanja",
+      privacy: "Privatnost",
+      terms: "Uslovi korišćenja",
+      copyright: (year: number) => `© ${year} MomentDrop. Sve fotografije i snimci sa vašeg događaja — na jednom mestu.`,
+    },
+    howItWorks: {
+      kicker: "Kako funkcioniše",
+      title: "Od QR koda do galerije, u četiri koraka",
+      subtitle: "Bez aplikacije za goste, bez naloga — samo skeniraju i šalju.",
+      steps: [
+        {
+          title: "Napravite događaj",
+          text: "Registrujte se i napravite događaj za par minuta: naziv, datum, poruka dobrodošlice i boja po vašem ukusu.",
+        },
+        {
+          title: "Podelite QR kod",
+          text: "Preuzmite karticu sa QR kodom i PIN-om (opciono), odštampajte je za sto ili je podelite kao link.",
+        },
+        {
+          title: "Gosti šalju slike i video",
+          text: "Gosti skeniraju kod telefonom i šalju fotografije i kratke snimke direktno iz browsera — bez instaliranja ičega.",
+        },
+        {
+          title: "Pratite i preuzmite galeriju",
+          text: "Sve stiže uživo u vašu galeriju dok traje proslava. Preuzmite sve u jednom ZIP fajlu kad god poželite.",
+        },
+      ],
+      cta: "Napravi svoj događaj",
+    },
+    pricing: {
+      kicker: "Cenovnik",
+      title: "Jednostavne cene, bez pretplate",
+      subtitle: "Svaki događaj počinje besplatno. Platite jednom, po događaju — samo ako vam treba više prostora i duže čuvanje.",
+      free: {
+        name: "Besplatan",
+        price: "0 €",
+        period: "za svaki događaj",
+        features: [
+          "Do 60 fotografija i video snimaka",
+          "Galerija dostupna 14 dana",
+          "Video do 60 sekundi po snimku",
+          "QR kod i opciona PIN zaštita",
+          "ZIP preuzimanje cele galerije",
+        ],
+        cta: "Počni besplatno",
+      },
+      premium: {
+        name: "Standard",
+        price: "29 €",
+        period: "jednokratno po događaju",
+        features: [
+          "Do 300 fotografija i video snimaka",
+          "Idealno za manje i srednje proslave",
+          "Puna pozadina — bez MomentDrop dekora",
+          "Galerija dostupna 6 meseci",
+          "Sve iz besplatnog plana",
+        ],
+        cta: "Izaberi Standard",
+        badge: "Najčešći izbor",
+      },
+      deluxe: {
+        name: "Premium",
+        price: "49 €",
+        period: "jednokratno po događaju",
+        features: [
+          "Neograničen broj fotografija i video snimaka",
+          "Za velika venčanja i proslave sa mnogo gostiju",
+          "Galerija dostupna 12 meseci",
+          "Sve iz Standard plana",
+        ],
+        cta: "Izaberi Premium",
+      },
+      business: {
+        name: "Poslovni",
+        subtitle: "Za firme, agencije i organizatore događaja — po upitu, prilagođeno vašem eventu.",
+        features: [
+          "Prilagođen dizajn stranice za goste",
+          "Montaža video zapisa sa događaja",
+          "Duže čuvanje po dogovoru",
+          "Prioritetna podrška",
+        ],
+        cta: "Pošaljite upit",
+      },
+      faqHint: "Imate još pitanja o cenama?",
+      faqLink: "Pogledajte FAQ",
+    },
+    faq: {
+      kicker: "Pitanja i odgovori",
+      title: "Često postavljena pitanja",
+      items: [
+        {
+          q: "Da li gosti moraju da instaliraju aplikaciju?",
+          a: "Ne. Gosti samo skeniraju QR kod i šalju fotografije i video direktno iz browsera na telefonu — bez preuzimanja aplikacije i bez pravljenja naloga.",
+        },
+        {
+          q: "Koliko dugo se čuvaju fotografije?",
+          a: "Zavisi od plana: besplatan plan čuva galeriju 14 dana, Standard 6 meseci, Premium 12 meseci od datuma nadogradnje. Preporučujemo da galeriju preuzmete pre isteka roka.",
+        },
+        {
+          q: "Šta ako mi zatreba više od 60 fotografija na besplatnom planu?",
+          a: "Nadogradite u podešavanjima događaja: Standard (29 €) daje do 300 fotografija i video snimaka, a Premium (49 €) neograničen broj — za velika venčanja sa puno gostiju. Oba su jednokratna plaćanja, bez pretplate.",
+        },
+        {
+          q: "Da li gosti mogu da vide tuđe fotografije?",
+          a: "Samo ako to vi omogućite u podešavanjima („Gosti vide galeriju“). Podrazumevano galeriju vidite samo vi kao domaćin.",
+        },
+        {
+          q: "Mogu li da zaštitim događaj PIN-om?",
+          a: "Da — uključite PIN zaštitu u podešavanjima. Gosti tada unose PIN pre nego što pošalju fotografije.",
+        },
+        {
+          q: "Koje formate fotografija i videa prihvatate?",
+          a: "JPG, PNG, HEIC i WebP za slike; MP4 i MOV za video, do 60 sekundi po snimku.",
+        },
+        {
+          q: "Kako se plaćaju Standard i Premium?",
+          a: "Plaćanje ide preko našeg partnera za naplatu — sigurno karticom, jednokratno po događaju. Mi ne vidimo i ne čuvamo podatke o vašoj kartici.",
+        },
+        {
+          q: "Mogu li da tražim povraćaj novca?",
+          a: "Da — javite se na usemomentdrop@gmail.com u roku od 14 dana od plaćanja i rešićemo to zajedno.",
+        },
+      ],
+    },
+  },
+  legal: {
+    privacy: {
+      title: "Politika privatnosti",
+      updated: "Poslednja izmena: 29. septembar 2026.",
+      intro:
+        "Ova stranica objašnjava koje podatke MomentDrop prikuplja kada koristite sajt kao domaćin ili gost događaja, i kako se ti podaci koriste.",
+      sections: [
+        {
+          heading: "Koje podatke prikupljamo",
+          body: "Kada napravite nalog: ime i email adresu. Kada napravite događaj: naziv, datum, poruku dobrodošlice i, opciono, logo ili naslovnu sliku. Kada gost pošalje fotografiju ili video: ime koje unese, sam fajl i tehničke podatke o fajlu (veličina, format, trajanje). Radi sprečavanja zloupotrebe privremeno beležimo IP adresu sa koje su zahtevi poslati.",
+        },
+        {
+          heading: "Gde se podaci čuvaju",
+          body: "Naloge i podatke o događajima čuvamo preko Supabase-a, a fotografije i video snimke preko Cloudflare R2 skladišta. Plaćanja obrađuje naš platni partner — mi ne vidimo i ne čuvamo podatke o vašoj platnoj kartici.",
+        },
+        {
+          heading: "Ko vidi fotografije",
+          body: "Fotografije i video snimke sa vašeg događaja vidite samo vi kao domaćin, osim ako uključite opciju „Gosti vide galeriju“ — tada ih vide i ostali gosti koji imaju link i PIN događaja.",
+        },
+        {
+          heading: "Koliko dugo čuvamo podatke",
+          body: "Fotografije sa besplatnog plana čuvamo 14 dana, sa Standard plana 6 meseci, a sa Premium plana 12 meseci od datuma nadogradnje, nakon čega mogu biti trajno obrisane. Nalog i informacije o događaju čuvamo dok ne zatražite brisanje.",
+        },
+        {
+          heading: "Vaša prava",
+          body: "Možete zatražiti uvid, ispravku ili brisanje svojih podataka u bilo kom trenutku — pošaljite nam email i rešićemo to u razumnom roku.",
+        },
+        {
+          heading: "Kontakt",
+          body: "Pitanja u vezi sa privatnošću šaljite na usemomentdrop@gmail.com.",
+        },
+      ],
+    },
+    terms: {
+      title: "Uslovi korišćenja",
+      updated: "Poslednja izmena: 29. septembar 2026.",
+      intro:
+        "Korišćenjem MomentDrop sajta prihvatate ove uslove. MomentDrop je za sada lični projekat, a ne registrovana firma — ako vam je to bitno pre plaćanja, slobodno nas kontaktirajte.",
+      sections: [
+        {
+          heading: "Šta MomentDrop radi",
+          body: "MomentDrop omogućava domaćinima događaja da prave galerije u koje gosti šalju fotografije i video snimke skeniranjem QR koda, bez instaliranja aplikacije.",
+        },
+        {
+          heading: "Nalozi i odgovornost",
+          body: "Odgovorni ste za tačnost podataka koje unesete i za sadržaj koji vi i vaši gosti pošaljete. Zabranjeno je slanje nezakonitog, uvredljivog sadržaja ili sadržaja koji krši prava trećih lica.",
+        },
+        {
+          heading: "Planovi i plaćanje",
+          body: "Besplatan plan ima ograničenja opisana na stranici Cenovnik. Standard i Premium su jednokratna plaćanja po događaju, obrađena preko našeg platnog partnera. Cene su izražene u evrima.",
+        },
+        {
+          heading: "Povraćaj novca",
+          body: "Ako niste zadovoljni Premium nadogradnjom, javite se na usemomentdrop@gmail.com u roku od 14 dana od plaćanja — razmotrićemo povraćaj od slučaja do slučaja.",
+        },
+        {
+          heading: "Čuvanje i brisanje sadržaja",
+          body: "Sadržaj se čuva u skladu sa rokovima opisanim u Politici privatnosti. Zadržavamo pravo da uklonimo sadržaj koji krši ove uslove.",
+        },
+        {
+          heading: "Ograničenje odgovornosti",
+          body: "MomentDrop se pruža „takav kakav jeste“. Ne garantujemo neprekidan rad servisa i ne odgovaramo za gubitak sadržaja usled više sile ili tehničkih problema van naše kontrole — preporučujemo da važne fotografije uvek preuzmete i sačuvate lokalno.",
+        },
+        {
+          heading: "Izmene uslova",
+          body: "Ove uslove možemo povremeno menjati; nastavak korišćenja servisa nakon izmene znači da ih prihvatate.",
+        },
+        {
+          heading: "Kontakt",
+          body: "Pitanja u vezi sa ovim uslovima šaljite na usemomentdrop@gmail.com.",
+        },
+      ],
     },
   },
 } as const;

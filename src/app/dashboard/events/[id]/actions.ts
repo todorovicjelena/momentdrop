@@ -14,6 +14,9 @@ import {
   type BrandingKind,
   type EventType,
 } from "@/lib/events";
+import { createCheckout } from "@/lib/lemonsqueezy";
+import { getOrigin } from "@/lib/origin";
+import { PLAN_LIMITS, type PaidPlan } from "@/lib/plans";
 import type { ActionResult } from "@/lib/result";
 import { t } from "@/lib/i18n";
 
@@ -83,11 +86,17 @@ export async function updateEvent(eventId: string, _prev: SettingsState, formDat
 
 async function ownedEvent(eventId: string) {
   const { supabase } = await requireUser(`/dashboard/events/${eventId}`);
-  const { data } = await supabase.from("events").select("id, slug, logo_key, cover_key").eq("id", eventId).maybeSingle();
+  const { data } = await supabase.from("events").select("id, slug, plan, logo_key, cover_key, background_key").eq("id", eventId).maybeSingle();
   return { supabase, event: data };
 }
 
 const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+
+const BRANDING_COLUMN: Record<BrandingKind, "logo_key" | "cover_key" | "background_key"> = {
+  logo: "logo_key",
+  cover: "cover_key",
+  background: "background_key",
+};
 
 // Step 1: validate and hand the browser a one-time upload URL.
 export async function presignBrandingUpload(
@@ -99,6 +108,9 @@ export async function presignBrandingUpload(
   const { event } = await ownedEvent(eventId);
   if (!event) return { ok: false, error: errors.notFound };
   if (!BRANDING.kinds.includes(kind)) return { ok: false, error: errors.uploadFailed };
+  if ((BRANDING.paidOnly as readonly string[]).includes(kind) && event.plan === "free") {
+    return { ok: false, error: errors.paidPlanRequired };
+  }
   if (!(BRANDING.mimeTypes as readonly string[]).includes(contentType)) return { ok: false, error: errors.imageType };
   if (!Number.isInteger(size) || size <= 0 || size > BRANDING.maxBytes) return { ok: false, error: errors.imageSize };
 
@@ -123,7 +135,7 @@ export async function saveBrandingImage(
     return { ok: false, error: errors.imageSize };
   }
 
-  const column = kind === "logo" ? "logo_key" : "cover_key";
+  const column = BRANDING_COLUMN[kind];
   const { error } = await supabase.from("events").update({ [column]: key }).eq("id", eventId);
   if (error) {
     console.error("saveBrandingImage failed:", error.code, error.message);
@@ -141,7 +153,7 @@ export async function removeBrandingImage(eventId: string, kind: BrandingKind): 
   const { supabase, event } = await ownedEvent(eventId);
   if (!event) return { ok: false, error: errors.notFound };
 
-  const column = kind === "logo" ? "logo_key" : "cover_key";
+  const column = BRANDING_COLUMN[kind];
   const old = event[column];
   const { error } = await supabase.from("events").update({ [column]: null }).eq("id", eventId);
   if (error) return { ok: false, error: errors.uploadFailed };
@@ -149,4 +161,24 @@ export async function removeBrandingImage(eventId: string, kind: BrandingKind): 
 
   revalidatePath(`/event/${event.slug}`);
   return { ok: true };
+}
+
+// ─── Premium upgrade (Lemon Squeezy) ────────────────────────────────────────
+
+// Starts a one-time-payment checkout for upgrading this event to the given
+// paid plan. The event's plan flips once Lemon Squeezy confirms payment via
+// webhook — see src/app/api/lemonsqueezy/webhook/route.ts.
+export async function createUpgradeCheckout(eventId: string, plan: PaidPlan): Promise<ActionResult<{ url: string }>> {
+  const { supabase } = await requireUser(`/dashboard/events/${eventId}`);
+  const { data: event } = await supabase.from("events").select("id, plan").eq("id", eventId).maybeSingle();
+  if (!event) return { ok: false, error: errors.notFound };
+  // Already at or above this plan (ranked by how much it includes) — nothing to buy.
+  if (PLAN_LIMITS[event.plan as keyof typeof PLAN_LIMITS].storageDays >= PLAN_LIMITS[plan].storageDays) {
+    return { ok: false, error: errors.checkoutFailed };
+  }
+
+  const redirectUrl = `${await getOrigin()}/dashboard/events/${eventId}?upgraded=1`;
+  const url = await createCheckout(eventId, plan, redirectUrl);
+  if (!url) return { ok: false, error: errors.checkoutFailed };
+  return { ok: true, url };
 }

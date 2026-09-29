@@ -9,6 +9,7 @@ import { mediaFileName, signMedia } from "@/lib/media";
 import type { ActionResult } from "@/lib/result";
 import { brandingKeyPrefix, isUploadClosed } from "@/lib/events";
 import { EXTENSIONS, fileKind, GUEST_NAME_MAX, guestKeyPrefix, maxBytes, maxMb, toMb, UPLOAD_LIMITS } from "@/lib/uploads";
+import { PLAN_LIMITS, type Plan } from "@/lib/plans";
 import { t } from "@/lib/i18n";
 
 // Guests have no account: every action re-checks the event, PIN and limits.
@@ -18,17 +19,17 @@ import { t } from "@/lib/i18n";
 const errors = t.guest.errors;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function openEvent(slug: string, pin: string): Promise<ActionResult<{ id: string }>> {
+async function openEvent(slug: string, pin: string): Promise<ActionResult<{ id: string; plan: Plan }>> {
   const { data: event } = await createAdminClient()
     .from("events")
-    .select("id, uploads_open, upload_deadline, pin_hash")
+    .select("id, uploads_open, upload_deadline, pin_hash, plan, storage_expires_at")
     .eq("slug", slug)
     .maybeSingle();
 
   if (!event) return { ok: false, error: errors.closed };
   if (isUploadClosed(event)) return { ok: false, error: errors.closed };
   if (!(await eventPinOk(event.pin_hash, pin))) return { ok: false, error: errors.wrongPin };
-  return { ok: true, id: event.id };
+  return { ok: true, id: event.id, plan: event.plan as Plan };
 }
 
 async function guestFileCount(eventId: string, guestToken: string) {
@@ -37,6 +38,14 @@ async function guestFileCount(eventId: string, guestToken: string) {
     .select("id", { count: "exact", head: true })
     .eq("event_id", eventId)
     .eq("guest_token", guestToken);
+  return count ?? 0;
+}
+
+async function eventFileCount(eventId: string) {
+  const { count } = await createAdminClient()
+    .from("uploads")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", eventId);
   return count ?? 0;
 }
 
@@ -65,6 +74,9 @@ export async function presignGuestUpload(slug: string, input: PresignInput): Pro
   const event = await openEvent(slug, input.pin);
   if (!event.ok) return event;
   if ((await guestFileCount(event.id, input.guestToken)) >= UPLOAD_LIMITS.maxFilesPerGuest) {
+    return { ok: false, error: errors.limit };
+  }
+  if ((await eventFileCount(event.id)) >= PLAN_LIMITS[event.plan].maxUploads) {
     return { ok: false, error: errors.limit };
   }
 

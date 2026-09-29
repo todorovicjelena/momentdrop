@@ -11,6 +11,7 @@ import { EventTypePicker } from "@/components/events/event-type-picker";
 import { BrandingUpload } from "@/components/events/branding-upload";
 import { updateEvent, type SettingsState } from "@/app/dashboard/events/[id]/actions";
 import { BRAND_COLORS, type EventType } from "@/lib/events";
+import type { Plan } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -27,6 +28,8 @@ export type SettingsFormEvent = {
   guests_can_view: boolean;
   logo_url: string | null;
   cover_url: string | null;
+  plan: Plan;
+  background_url: string | null;
 };
 
 export function SettingsForm({ event }: { event: SettingsFormEvent }) {
@@ -101,6 +104,12 @@ export function SettingsForm({ event }: { event: SettingsFormEvent }) {
 
         <BrandingUpload eventId={event.id} kind="logo" initialUrl={event.logo_url} />
         <BrandingUpload eventId={event.id} kind="cover" initialUrl={event.cover_url} />
+
+        {event.plan === "free" ? (
+          <p className="rounded-2xl bg-lilac-soft px-4 py-3 text-sm text-ink">{t.settings.backgroundLocked}</p>
+        ) : (
+          <BrandingUpload eventId={event.id} kind="background" initialUrl={event.background_url} />
+        )}
       </Section>
 
       <Section title={t.settings.sections.uploads}>
