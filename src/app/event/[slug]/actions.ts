@@ -8,7 +8,7 @@ import { deleteObject, objectSize, presignPut } from "@/lib/r2";
 import { mediaFileName, signMedia } from "@/lib/media";
 import type { ActionResult } from "@/lib/result";
 import { brandingKeyPrefix, isUploadClosed } from "@/lib/events";
-import { EXTENSIONS, fileKind, GUEST_NAME_MAX, guestKeyPrefix, maxBytes, maxMb, toMb, UPLOAD_LIMITS } from "@/lib/uploads";
+import { EXTENSIONS, fileKind, GUEST_NAME_MAX, guestKeyPrefix, maxBytes, maxMb, toMb, UPLOAD_LIMITS, type FileKind } from "@/lib/uploads";
 import { PLAN_LIMITS, type Plan } from "@/lib/plans";
 import { t } from "@/lib/i18n";
 
@@ -70,9 +70,16 @@ export async function presignGuestUpload(slug: string, input: PresignInput): Pro
   if (kind === "video" && (input.durationSeconds ?? 0) > UPLOAD_LIMITS.maxVideoSeconds + 0.5) {
     return { ok: false, error: errors.videoTooLong(input.durationSeconds ?? 0) };
   }
+  if (kind === "audio" && (input.durationSeconds ?? 0) > UPLOAD_LIMITS.maxAudioSeconds + 0.5) {
+    return { ok: false, error: errors.audioTooLong(input.durationSeconds ?? 0) };
+  }
 
   const event = await openEvent(slug, input.pin);
   if (!event.ok) return event;
+  // Audio guestbook is a Premium-only perk — enforced here, not just hidden in the UI.
+  if (kind === "audio" && event.plan !== "deluxe") {
+    return { ok: false, error: errors.audioPremiumOnly };
+  }
   if ((await guestFileCount(event.id, input.guestToken)) >= UPLOAD_LIMITS.maxFilesPerGuest) {
     return { ok: false, error: errors.limit };
   }
@@ -128,7 +135,7 @@ export async function confirmGuestUpload(slug: string, input: ConfirmInput): Pro
     size_bytes: size,
     width: int(input.width),
     height: int(input.height),
-    duration_seconds: kind === "video" && input.durationSeconds ? Math.min(input.durationSeconds, 9999) : null,
+    duration_seconds: (kind === "video" || kind === "audio") && input.durationSeconds ? Math.min(input.durationSeconds, 9999) : null,
   }).select("id").single();
 
   if (row) return { ok: true, id: row.id };
@@ -172,7 +179,7 @@ export async function deleteMyUpload(
 
 export type GuestGalleryItem = {
   id: string;
-  kind: "image" | "video";
+  kind: FileKind;
   guestName: string;
   createdAt: string;
   url: string;

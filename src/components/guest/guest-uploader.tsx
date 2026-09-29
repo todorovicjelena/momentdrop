@@ -7,13 +7,25 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useStoredValue } from "@/hooks/use-stored-value";
 import { useGuestUploads } from "@/hooks/use-guest-uploads";
 import { IdentityForm } from "./guest-identity-form";
+import { AudioRecorder } from "./audio-recorder";
 import { UploadRow } from "./upload-row";
+import type { Plan } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
 const g = t.guest;
 
-export function GuestUploader({ slug, hasPin, guestsCanView }: { slug: string; hasPin: boolean; guestsCanView: boolean }) {
+export function GuestUploader({
+  slug,
+  hasPin,
+  guestsCanView,
+  plan,
+}: {
+  slug: string;
+  hasPin: boolean;
+  guestsCanView: boolean;
+  plan: Plan;
+}) {
   // Name is remembered on this phone; the PIN only for this browser session.
   const [name, setName] = useStoredValue("local", "momentdrop:guest-name");
   const [pin, setPin] = useStoredValue("session", `momentdrop:pin:${slug}`);
@@ -42,6 +54,7 @@ export function GuestUploader({ slug, hasPin, guestsCanView }: { slug: string; h
       pin={pin ?? ""}
       galleryHref={guestsCanView ? `/event/${slug}/gallery` : undefined}
       onChangeName={() => setEditing(true)}
+      canRecordAudio={plan === "deluxe"}
     />
   );
 }
@@ -52,12 +65,14 @@ function Uploader({
   pin,
   galleryHref,
   onChangeName,
+  canRecordAudio,
 }: {
   slug: string;
   guestName: string;
   pin: string;
   galleryHref?: string; // only when the host lets guests see the gallery
   onChangeName: () => void;
+  canRecordAudio: boolean;
 }) {
   const { items, addFiles, retry, removeSent, clear, done, failed, retryable, busy } = useGuestUploads(slug);
   const allFinished = items.length > 0 && !busy;
@@ -116,6 +131,8 @@ function Uploader({
           }}
         />
       </label>
+
+      {canRecordAudio && <AudioRecorder onRecorded={(file) => addFiles([file], { guestName, pin })} />}
 
       {items.length > 0 && (
         <>

@@ -22,13 +22,13 @@ type UploadRow = {
   created_at: string;
 };
 
-const FILTERS = ["all", "image", "video"] as const;
+const FILTERS = ["all", "image", "video", "audio"] as const;
 type Filter = (typeof FILTERS)[number];
 
 export default async function GalleryPage({ params, searchParams }: PageProps<"/dashboard/events/[id]/gallery">) {
   const { id } = await params;
   const { type } = await searchParams;
-  const filter: Filter = type === "image" || type === "video" ? type : "all";
+  const filter: Filter = type === "image" || type === "video" || type === "audio" ? type : "all";
   const { supabase, event } = await getOwnedEvent(id);
 
   // RLS: only uploads of your own events come back.
@@ -44,6 +44,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
     all: all.length,
     image: all.filter((u) => u.file_type === "image").length,
     video: all.filter((u) => u.file_type === "video").length,
+    audio: all.filter((u) => u.file_type === "audio").length,
   };
   const shown = filter === "all" ? all : all.filter((u) => u.file_type === filter);
 
@@ -87,13 +88,13 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
         <GalleryGrid
           items={items}
           onDelete={deleteUpload.bind(null, event.id)}
-          zipName={`${event.slug}${filter === "all" ? "" : filter === "image" ? "-slike" : "-video"}.zip`}
+          zipName={`${event.slug}${filter === "all" ? "" : filter === "image" ? "-slike" : filter === "video" ? "-video" : "-audio"}.zip`}
         />
       ) : (
         <div className="flex flex-col items-center gap-3 rounded-[2rem] bg-card px-6 py-12 text-center shadow-sm">
           <DancingFlowers className="w-48" />
-          <p className="font-heading text-2xl font-bold">{t.gallery.empty}</p>
-          <p className="max-w-sm text-muted-foreground">{t.gallery.emptyHint}</p>
+          <p className="font-heading text-2xl font-bold">{t.gallery.empty[filter]}</p>
+          <p className="max-w-sm text-muted-foreground">{t.gallery.emptyHint[filter]}</p>
         </div>
       )}
     </main>

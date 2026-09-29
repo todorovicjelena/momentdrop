@@ -56,7 +56,7 @@ export default async function GuestEventPage({ params }: PageProps<"/event/[slug
           {isUploadClosed(event) ? (
             <GuestNotice icon={<Lock aria-hidden />} title={t.guest.closedTitle} text={t.guest.closedText} />
           ) : (
-            <GuestUploader slug={event.slug} hasPin={event.has_pin} guestsCanView={event.guests_can_view} />
+            <GuestUploader slug={event.slug} hasPin={event.has_pin} guestsCanView={event.guests_can_view} plan={event.plan} />
           )}
         </div>
       </div>

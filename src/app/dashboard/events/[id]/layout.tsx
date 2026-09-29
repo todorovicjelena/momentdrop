@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, Images, QrCode, Settings } from "lucide-react";
+import { ChevronRight, Images, MonitorPlay, QrCode, Settings } from "lucide-react";
 import { getOwnedEvent } from "@/lib/owned-event";
 import { getOrigin } from "@/lib/origin";
 import { NavTabs } from "@/components/nav-tabs";
@@ -35,6 +35,9 @@ export default async function EventLayout({ params, children }: LayoutProps<"/da
             { href: `${base}/gallery`, label: t.gallery.open, icon: <Images aria-hidden /> },
             { href: base, label: t.settings.open, icon: <Settings aria-hidden /> },
             { href: `/event/${event.slug}`, label: t.settings.guestPage, icon: <QrCode aria-hidden />, external: true },
+            ...(event.plan === "deluxe"
+              ? [{ href: `/slideshow/${event.id}`, label: t.slideshow.open, icon: <MonitorPlay aria-hidden />, external: true }]
+              : []),
           ]}
         />
 

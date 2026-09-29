@@ -3,6 +3,7 @@ import { cache } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { presignGet } from "@/lib/r2";
 import type { EventType } from "@/lib/events";
+import type { Plan } from "@/lib/plans";
 
 // What a guest may see about an event. Never include owner_id or pin_hash here.
 export type PublicEvent = {
@@ -22,6 +23,7 @@ export type PublicEvent = {
   cover_url: string | null;
   // Set only on paid plans — replaces the default swirl decoration, see GuestShell.
   background_url: string | null;
+  plan: Plan;
 };
 
 // cache(): page and generateMetadata share one query per request.
@@ -29,7 +31,7 @@ export const getPublicEvent = cache(async (slug: string): Promise<PublicEvent | 
   const { data, error } = await createAdminClient()
     .from("events")
     .select(
-      "id, slug, title, event_type, event_date, welcome_message, primary_color, uploads_open, upload_deadline, storage_expires_at, guests_can_view, pin_hash, logo_key, cover_key, background_key",
+      "id, slug, title, event_type, event_date, welcome_message, primary_color, uploads_open, upload_deadline, storage_expires_at, guests_can_view, pin_hash, logo_key, cover_key, background_key, plan",
     )
     .eq("slug", slug)
     .maybeSingle();

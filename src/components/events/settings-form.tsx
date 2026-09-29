@@ -9,8 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { FormError, FormField } from "@/components/form-field";
 import { EventTypePicker } from "@/components/events/event-type-picker";
 import { BrandingUpload } from "@/components/events/branding-upload";
+import { BackgroundPreview } from "@/components/events/background-preview";
+import { BackgroundPreviewDialog } from "@/components/events/background-preview-dialog";
 import { updateEvent, type SettingsState } from "@/app/dashboard/events/[id]/actions";
-import { BRAND_COLORS, type EventType } from "@/lib/events";
+import { BRAND_COLORS, todayLocal, type EventType } from "@/lib/events";
 import type { Plan } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -58,7 +60,7 @@ export function SettingsForm({ event }: { event: SettingsFormEvent }) {
           <Input id="title" name="title" required maxLength={120} defaultValue={event.title} />
         </FormField>
         <FormField id="event_date" label={t.newEvent.date}>
-          <Input id="event_date" name="event_date" type="date" defaultValue={event.event_date ?? ""} />
+          <Input id="event_date" name="event_date" type="date" min={todayLocal()} defaultValue={event.event_date ?? ""} />
         </FormField>
         <FormField id="welcome_message" label={t.settings.welcome} hint={t.settings.welcomeHint}>
           <Textarea
@@ -106,7 +108,11 @@ export function SettingsForm({ event }: { event: SettingsFormEvent }) {
         <BrandingUpload eventId={event.id} kind="cover" initialUrl={event.cover_url} />
 
         {event.plan === "free" ? (
-          <p className="rounded-2xl bg-lilac-soft px-4 py-3 text-sm text-ink">{t.settings.backgroundLocked}</p>
+          <div className="flex flex-col gap-3">
+            <BackgroundPreview />
+            <p className="rounded-2xl bg-lilac-soft px-4 py-3 text-sm text-ink">{t.settings.backgroundLocked}</p>
+            <BackgroundPreviewDialog />
+          </div>
         ) : (
           <BrandingUpload eventId={event.id} kind="background" initialUrl={event.background_url} />
         )}
@@ -115,7 +121,7 @@ export function SettingsForm({ event }: { event: SettingsFormEvent }) {
       <Section title={t.settings.sections.uploads}>
         <SwitchRow name="uploads_open" label={t.settings.uploadsOpen} hint={t.settings.uploadsOpenHint} defaultChecked={event.uploads_open} />
         <FormField id="upload_deadline" label={t.settings.deadline} hint={t.settings.deadlineHint}>
-          <Input id="upload_deadline" name="upload_deadline" type="datetime-local" defaultValue={event.deadline_local} />
+          <Input id="upload_deadline" name="upload_deadline" type="datetime-local" min={`${todayLocal()}T00:00`} defaultValue={event.deadline_local} />
         </FormField>
       </Section>
 

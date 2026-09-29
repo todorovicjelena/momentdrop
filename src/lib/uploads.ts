@@ -2,11 +2,15 @@
 
 export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/heic", "image/heif", "image/webp"] as const;
 export const VIDEO_TYPES = ["video/mp4", "video/quicktime"] as const;
+// Recorded in-browser via MediaRecorder — Chrome/Android give webm, Safari/iOS gives mp4.
+export const AUDIO_TYPES = ["audio/webm", "audio/mp4", "audio/mpeg", "audio/ogg"] as const;
 
 export const UPLOAD_LIMITS = {
   maxImageBytes: 30 * 1024 * 1024, // after compression; HEIC originals are uploaded as-is
   maxVideoBytes: 150 * 1024 * 1024,
   maxVideoSeconds: 60,
+  maxAudioBytes: 20 * 1024 * 1024,
+  maxAudioSeconds: 120, // 2-minute voice message, matches the Premium "audio guestbook" pitch
   maxFilesPerGuest: 50,
   imageMaxDimension: 2500,
   imageQuality: 0.8,
@@ -20,18 +24,25 @@ export const EXTENSIONS: Record<string, string> = {
   "image/webp": "webp",
   "video/mp4": "mp4",
   "video/quicktime": "mov",
+  "audio/webm": "webm",
+  "audio/mp4": "m4a",
+  "audio/mpeg": "mp3",
+  "audio/ogg": "ogg",
 };
 
-export type FileKind = "image" | "video";
+export type FileKind = "image" | "video" | "audio";
 
 export function fileKind(mime: string): FileKind | null {
   if ((IMAGE_TYPES as readonly string[]).includes(mime)) return "image";
   if ((VIDEO_TYPES as readonly string[]).includes(mime)) return "video";
+  if ((AUDIO_TYPES as readonly string[]).includes(mime)) return "audio";
   return null;
 }
 
 export function maxBytes(kind: FileKind) {
-  return kind === "image" ? UPLOAD_LIMITS.maxImageBytes : UPLOAD_LIMITS.maxVideoBytes;
+  if (kind === "image") return UPLOAD_LIMITS.maxImageBytes;
+  if (kind === "video") return UPLOAD_LIMITS.maxVideoBytes;
+  return UPLOAD_LIMITS.maxAudioBytes;
 }
 
 // Guests upload into events/<eventId>/<uuid>.<ext>; branding lives in a subfolder.

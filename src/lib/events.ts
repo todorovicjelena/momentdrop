@@ -83,6 +83,12 @@ export function brandingKeyPrefix(eventId: string) {
 export const EVENT_TIMEZONE = "Europe/Belgrade";
 const LOCAL_INPUT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
+// "Today" as YYYY-MM-DD in Belgrade time — used as the min for date pickers
+// (event date, upload deadline) so hosts can't pick a day that's already past.
+export function todayLocal(timeZone = EVENT_TIMEZONE) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(new Date());
+}
+
 function zonedParts(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,

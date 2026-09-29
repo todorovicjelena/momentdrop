@@ -17,7 +17,7 @@ export const sr = {
   },
   app: {
     name: "MomentDrop",
-    tagline: "Sve fotografije i snimci sa vašeg događaja — na jednom mestu.",
+    tagline: "Sve fotografije i snimci sa vašeg događaja - na jednom mestu.",
     headline: ["Svaki kadar", "sa vašeg događaja."],
     kicker: "Jedan QR kod. Sve uspomene.",
     footerLine: "Venčanja · Krštenja · Rođendani · Žurke · Korporativni događaji",
@@ -35,6 +35,7 @@ export const sr = {
     signup: "Registracija",
     logout: "Odjava",
     events: "Moji događaji",
+    menu: "Meni",
   },
   auth: {
     loginTitle: "Dobro došli nazad",
@@ -114,25 +115,40 @@ export const sr = {
     galleryTitle: "Galerija",
     sendTab: "Pošalji",
     hostBar: "Ovo je tvoj događaj",
-    galleryEmpty: "Još niko nije poslao fotografije. Budite prvi!",
+    galleryEmpty: "Još niko nije poslao fotografije ni poruke. Budite prvi!",
     galleryClosed: "Galerija nije javna",
     galleryClosedText: "Domaćini su odlučili da fotografije vide samo oni.",
     closedTitle: "Upload je zatvoren",
     closedText: "Domaćini više ne primaju fotografije. Hvala što ste bili sa nama!",
+    audio: {
+      title: "Ostavite glasovnu poruku",
+      hint: "Do 2 minuta - domaćini su omogućili audio gostinsku knjigu.",
+      record: "Snimi poruku",
+      recording: "Snimam…",
+      stop: "Zaustavi",
+      retake: "Snimi ponovo",
+      send: "Pošalji poruku",
+      micDenied: "Nije moguće pristupiti mikrofonu. Proverite dozvole u browseru.",
+    },
     errors: {
       nameRequired: "Unesite ime.",
       wrongPin: "Pogrešan PIN.",
       closed: "Upload je zatvoren.",
       fileType: (ext: string) =>
         `${ext ? `Format .${ext} nije podržan.` : "Ova vrsta fajla nije podržana."} Dozvoljeno: JPG, PNG, HEIC, WebP, MP4, MOV.`,
-      tooBig: (sizeMb: number, kind: "image" | "video", limitMb: number) =>
-        `Fajl ima ${sizeMb} MB. ${kind === "video" ? "Video" : "Slika"} može imati najviše ${limitMb} MB.`,
+      tooBig: (sizeMb: number, kind: "image" | "video" | "audio", limitMb: number) =>
+        `Fajl ima ${sizeMb} MB. ${kind === "video" ? "Video" : kind === "audio" ? "Audio" : "Slika"} može imati najviše ${limitMb} MB.`,
       videoTooLong: (seconds: number) => {
         const s = Math.round(seconds);
         return `Video traje ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}. Najviše 60 sekundi.`;
       },
+      audioTooLong: (seconds: number) => {
+        const s = Math.round(seconds);
+        return `Poruka traje ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}. Najviše 2 minuta.`;
+      },
+      audioPremiumOnly: "Audio gostinska knjiga je dostupna samo na Premium planu.",
       someRejected: (n: number) =>
-        `${n} ${plural(n, "fajl ne može", "fajla ne mogu", "fajlova ne može")} da se pošalje — razlog je ispod.`,
+        `${n} ${plural(n, "fajl ne može", "fajla ne mogu", "fajlova ne može")} da se pošalje - razlog je ispod.`,
       limit: "Dostigli ste limit od 50 fajlova.",
       rateLimit: "Previše pokušaja. Sačekajte par minuta.",
       failed: "Slanje nije uspelo. Proverite internet.",
@@ -165,6 +181,11 @@ export const sr = {
     background: "Puna pozadina",
     backgroundHint: "Zamenjuje MomentDrop dekor na stranici za goste vašom slikom.",
     backgroundLocked: "Dostupno na Standard i Premium planu - bez MomentDrop dekora, samo vaša slika u pozadini.",
+    backgroundPreviewBefore: "Sada - MomentDrop dekor",
+    backgroundPreviewAfter: "Sa Standard/Premium - vaša slika",
+    backgroundPreviewCta: "Pogledaj primer",
+    backgroundPreviewTitle: "Ovako bi izgledalo",
+    backgroundPreviewNote: "Primer sa izmišljenim događajem - vaša stranica bi imala vaš logo, naziv i vašu fotografiju umesto ove.",
     chooseImage: "Izaberi sliku",
     replaceImage: "Zameni",
     removeImage: "Ukloni",
@@ -206,9 +227,19 @@ export const sr = {
   gallery: {
     title: "Galerija",
     open: "Galerija",
-    filters: { all: "Sve", image: "Slike", video: "Video" },
-    empty: "Još nema fotografija.",
-    emptyHint: "Kad gosti počnu da šalju, ovde ćete videti sve njihove slike i snimke.",
+    filters: { all: "Sve", image: "Slike", video: "Video", audio: "Audio" },
+    empty: {
+      all: "Još nema fotografija.",
+      image: "Još nema fotografija.",
+      video: "Još nema video snimaka.",
+      audio: "Još nema glasovnih poruka.",
+    },
+    emptyHint: {
+      all: "Kad gosti počnu da šalju, ovde ćete videti sve njihove slike, snimke i glasovne poruke.",
+      image: "Kad gosti počnu da šalju fotografije, ovde će se pojaviti.",
+      video: "Kad gosti počnu da šalju video snimke, ovde će se pojaviti.",
+      audio: "Kad gosti počnu da ostavljaju glasovne poruke, ovde će se pojaviti.",
+    },
     from: (name: string) => `od: ${name}`,
     download: "Preuzmi",
     delete: "Obriši",
@@ -219,10 +250,10 @@ export const sr = {
     zipReady: "ZIP je spreman ✓",
     saved: "Sačuvano ✓",
     preparing: (done: number, total: number) => `Pripremam ${done}/${total}…`,
-    shareHint: "Otvoriće se deljenje — izaberi „Sačuvaj sliku“ da ode u galeriju telefona.",
+    shareHint: "Otvoriće se deljenje - izaberi „Sačuvaj sliku“ da ode u galeriju telefona.",
     tooManyMobile: (n: number) =>
       `Na telefonu možeš da sačuvaš do ${n} slika odjednom. Izaberi manje, ili preuzmi ceo album na računaru.`,
-    guidedSaveHint: "Dodirni sliku pa „Sačuvaj“ — jednu po jednu.",
+    guidedSaveHint: "Dodirni sliku pa „Sačuvaj“ - jednu po jednu.",
     saveFailed: "Čuvanje nije uspelo. Pokušaj ponovo.",
     close: "Zatvori",
     downloadAll: (n: number) => `Preuzmi sve (${n})`,
@@ -241,7 +272,7 @@ export const sr = {
   qr: {
     open: "QR kod",
     title: "QR kod za goste",
-    subtitle: "Gosti skeniraju i šalju slike i snimke — bez aplikacije.",
+    subtitle: "Gosti skeniraju i šalju slike i snimke - bez aplikacije.",
     kicker: "Jedan QR kod. Sve uspomene.",
     instruction: "Skeniraj kod telefonom i pošalji slike i snimke sa događaja.",
     footer: "Sve uspomene na jednom mestu",
@@ -251,6 +282,13 @@ export const sr = {
     downloadQr: "Preuzmi QR",
     print: "Štampaj",
     close: "Zatvori",
+  },
+  slideshow: {
+    open: "Live slideshow",
+    hint: "Pustite na TV ili projektor - sama se osvežava kako gosti šalju slike.",
+    lockedTitle: "Live slideshow je Premium pogodnost",
+    lockedText: "Nadogradite događaj na Premium plan da biste pustili live slideshow.",
+    waiting: "Čekamo prve fotografije…",
   },
   newEvent: {
     title: "Novi događaj",
@@ -286,12 +324,12 @@ export const sr = {
       faq: "Pitanja",
       privacy: "Privatnost",
       terms: "Uslovi korišćenja",
-      copyright: (year: number) => `© ${year} MomentDrop. Sve fotografije i snimci sa vašeg događaja — na jednom mestu.`,
+      copyright: (year: number) => `© ${year} MomentDrop. Sve fotografije i snimci sa vašeg događaja - na jednom mestu.`,
     },
     howItWorks: {
       kicker: "Kako funkcioniše",
       title: "Od QR koda do galerije, u četiri koraka",
-      subtitle: "Bez aplikacije za goste, bez naloga — samo skeniraju i šalju.",
+      subtitle: "Bez aplikacije za goste, bez naloga - samo skeniraju i šalju.",
       steps: [
         {
           title: "Napravite događaj",
@@ -303,7 +341,7 @@ export const sr = {
         },
         {
           title: "Gosti šalju slike i video",
-          text: "Gosti skeniraju kod telefonom i šalju fotografije i kratke snimke direktno iz browsera — bez instaliranja ičega.",
+          text: "Gosti skeniraju kod telefonom i šalju fotografije i kratke snimke direktno iz browsera - bez instaliranja ičega.",
         },
         {
           title: "Pratite i preuzmite galeriju",
@@ -315,7 +353,7 @@ export const sr = {
     pricing: {
       kicker: "Cenovnik",
       title: "Jednostavne cene, bez pretplate",
-      subtitle: "Svaki događaj počinje besplatno. Platite jednom, po događaju — samo ako vam treba više prostora i duže čuvanje.",
+      subtitle: "Svaki događaj počinje besplatno. Platite jednom, po događaju - samo ako vam treba više prostora i duže čuvanje.",
       free: {
         name: "Besplatan",
         price: "0 €",
@@ -336,7 +374,7 @@ export const sr = {
         features: [
           "Do 300 fotografija i video snimaka",
           "Idealno za manje i srednje proslave",
-          "Puna pozadina — bez MomentDrop dekora",
+          "Puna pozadina - bez MomentDrop dekora",
           "Galerija dostupna 6 meseci",
           "Sve iz besplatnog plana",
         ],
@@ -349,6 +387,7 @@ export const sr = {
         period: "jednokratno po događaju",
         features: [
           "Neograničen broj fotografija i video snimaka",
+          "Audio gostinska knjiga - glasovne poruke gostiju",
           "Za velika venčanja i proslave sa mnogo gostiju",
           "Galerija dostupna 12 meseci",
           "Sve iz Standard plana",
@@ -375,7 +414,7 @@ export const sr = {
       items: [
         {
           q: "Da li gosti moraju da instaliraju aplikaciju?",
-          a: "Ne. Gosti samo skeniraju QR kod i šalju fotografije i video direktno iz browsera na telefonu — bez preuzimanja aplikacije i bez pravljenja naloga.",
+          a: "Ne. Gosti samo skeniraju QR kod i šalju fotografije i video direktno iz browsera na telefonu - bez preuzimanja aplikacije i bez pravljenja naloga.",
         },
         {
           q: "Koliko dugo se čuvaju fotografije?",
@@ -383,7 +422,7 @@ export const sr = {
         },
         {
           q: "Šta ako mi zatreba više od 60 fotografija na besplatnom planu?",
-          a: "Nadogradite u podešavanjima događaja: Standard (29 €) daje do 300 fotografija i video snimaka, a Premium (49 €) neograničen broj — za velika venčanja sa puno gostiju. Oba su jednokratna plaćanja, bez pretplate.",
+          a: "Nadogradite u podešavanjima događaja: Standard (29 €) daje do 300 fotografija i video snimaka, a Premium (49 €) neograničen broj - za velika venčanja sa puno gostiju. Oba su jednokratna plaćanja, bez pretplate.",
         },
         {
           q: "Da li gosti mogu da vide tuđe fotografije?",
@@ -391,7 +430,7 @@ export const sr = {
         },
         {
           q: "Mogu li da zaštitim događaj PIN-om?",
-          a: "Da — uključite PIN zaštitu u podešavanjima. Gosti tada unose PIN pre nego što pošalju fotografije.",
+          a: "Da - uključite PIN zaštitu u podešavanjima. Gosti tada unose PIN pre nego što pošalju fotografije.",
         },
         {
           q: "Koje formate fotografija i videa prihvatate?",
@@ -399,11 +438,11 @@ export const sr = {
         },
         {
           q: "Kako se plaćaju Standard i Premium?",
-          a: "Plaćanje ide preko našeg partnera za naplatu — sigurno karticom, jednokratno po događaju. Mi ne vidimo i ne čuvamo podatke o vašoj kartici.",
+          a: "Plaćanje ide preko našeg partnera za naplatu - sigurno karticom, jednokratno po događaju. Mi ne vidimo i ne čuvamo podatke o vašoj kartici.",
         },
         {
           q: "Mogu li da tražim povraćaj novca?",
-          a: "Da — javite se na usemomentdrop@gmail.com u roku od 14 dana od plaćanja i rešićemo to zajedno.",
+          a: "Da - javite se na usemomentdrop@gmail.com u roku od 14 dana od plaćanja i rešićemo to zajedno.",
         },
       ],
     },
@@ -421,11 +460,11 @@ export const sr = {
         },
         {
           heading: "Gde se podaci čuvaju",
-          body: "Naloge i podatke o događajima čuvamo preko Supabase-a, a fotografije i video snimke preko Cloudflare R2 skladišta. Plaćanja obrađuje naš platni partner — mi ne vidimo i ne čuvamo podatke o vašoj platnoj kartici.",
+          body: "Naloge i podatke o događajima čuvamo preko Supabase-a, a fotografije i video snimke preko Cloudflare R2 skladišta. Plaćanja obrađuje naš platni partner - mi ne vidimo i ne čuvamo podatke o vašoj platnoj kartici.",
         },
         {
           heading: "Ko vidi fotografije",
-          body: "Fotografije i video snimke sa vašeg događaja vidite samo vi kao domaćin, osim ako uključite opciju „Gosti vide galeriju“ — tada ih vide i ostali gosti koji imaju link i PIN događaja.",
+          body: "Fotografije i video snimke sa vašeg događaja vidite samo vi kao domaćin, osim ako uključite opciju „Gosti vide galeriju“ - tada ih vide i ostali gosti koji imaju link i PIN događaja.",
         },
         {
           heading: "Koliko dugo čuvamo podatke",
@@ -433,7 +472,7 @@ export const sr = {
         },
         {
           heading: "Vaša prava",
-          body: "Možete zatražiti uvid, ispravku ili brisanje svojih podataka u bilo kom trenutku — pošaljite nam email i rešićemo to u razumnom roku.",
+          body: "Možete zatražiti uvid, ispravku ili brisanje svojih podataka u bilo kom trenutku - pošaljite nam email i rešićemo to u razumnom roku.",
         },
         {
           heading: "Kontakt",
@@ -445,7 +484,7 @@ export const sr = {
       title: "Uslovi korišćenja",
       updated: "Poslednja izmena: 29. septembar 2026.",
       intro:
-        "Korišćenjem MomentDrop sajta prihvatate ove uslove. MomentDrop je za sada lični projekat, a ne registrovana firma — ako vam je to bitno pre plaćanja, slobodno nas kontaktirajte.",
+        "Korišćenjem MomentDrop sajta prihvatate ove uslove. MomentDrop je za sada lični projekat, a ne registrovana firma - ako vam je to bitno pre plaćanja, slobodno nas kontaktirajte.",
       sections: [
         {
           heading: "Šta MomentDrop radi",
@@ -461,7 +500,7 @@ export const sr = {
         },
         {
           heading: "Povraćaj novca",
-          body: "Ako niste zadovoljni Premium nadogradnjom, javite se na usemomentdrop@gmail.com u roku od 14 dana od plaćanja — razmotrićemo povraćaj od slučaja do slučaja.",
+          body: "Ako niste zadovoljni Premium nadogradnjom, javite se na usemomentdrop@gmail.com u roku od 14 dana od plaćanja - razmotrićemo povraćaj od slučaja do slučaja.",
         },
         {
           heading: "Čuvanje i brisanje sadržaja",
@@ -469,7 +508,7 @@ export const sr = {
         },
         {
           heading: "Ograničenje odgovornosti",
-          body: "MomentDrop se pruža „takav kakav jeste“. Ne garantujemo neprekidan rad servisa i ne odgovaramo za gubitak sadržaja usled više sile ili tehničkih problema van naše kontrole — preporučujemo da važne fotografije uvek preuzmete i sačuvate lokalno.",
+          body: "MomentDrop se pruža „takav kakav jeste“. Ne garantujemo neprekidan rad servisa i ne odgovaramo za gubitak sadržaja usled više sile ili tehničkih problema van naše kontrole - preporučujemo da važne fotografije uvek preuzmete i sačuvate lokalno.",
         },
         {
           heading: "Izmene uslova",

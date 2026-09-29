@@ -49,6 +49,21 @@ function videoDuration(file: File) {
   });
 }
 
+function audioDuration(file: File) {
+  return new Promise<number | undefined>((resolve) => {
+    const audio = new Audio();
+    const url = URL.createObjectURL(file);
+    const done = (value?: number) => {
+      URL.revokeObjectURL(url);
+      resolve(value);
+    };
+    audio.preload = "metadata";
+    audio.onloadedmetadata = () => done(Number.isFinite(audio.duration) ? audio.duration : undefined);
+    audio.onerror = () => done(undefined);
+    audio.src = url;
+  });
+}
+
 async function imageSize(blob: Blob) {
   try {
     const bitmap = await createImageBitmap(blob);
@@ -111,6 +126,11 @@ export function useGuestUploads(slug: string) {
         durationSeconds = await videoDuration(file);
         if (durationSeconds && durationSeconds > UPLOAD_LIMITS.maxVideoSeconds + 0.5) {
           return fail(errors.videoTooLong(durationSeconds), false);
+        }
+      } else if (kind === "audio") {
+        durationSeconds = await audioDuration(file);
+        if (durationSeconds && durationSeconds > UPLOAD_LIMITS.maxAudioSeconds + 0.5) {
+          return fail(errors.audioTooLong(durationSeconds), false);
         }
       } else {
         body = await prepareImage(file, mime);

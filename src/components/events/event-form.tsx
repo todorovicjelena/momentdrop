@@ -10,7 +10,7 @@ import { EventTypePicker } from "@/components/events/event-type-picker";
 import { createEvent, type CreateEventState } from "@/app/dashboard/actions";
 import { useSlugFromTitle } from "@/hooks/use-slug-from-title";
 import { useSlugAvailability } from "@/hooks/use-slug-availability";
-import type { EventType } from "@/lib/events";
+import { todayLocal, type EventType } from "@/lib/events";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -43,7 +43,7 @@ export function EventForm({ linkPrefix }: { linkPrefix: string }) {
       </FormField>
 
       <FormField id="event_date" label={t.newEvent.date}>
-        <Input id="event_date" name="event_date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <Input id="event_date" name="event_date" type="date" min={todayLocal()} value={date} onChange={(e) => setDate(e.target.value)} />
       </FormField>
 
       <FormField id="slug" label={t.newEvent.slug}>

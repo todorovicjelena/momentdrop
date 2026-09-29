@@ -1,8 +1,8 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- presigned R2 URLs, not optimizable by next/image */
-import { useOptimistic, useState, useTransition } from "react";
-import { Check, CheckSquare, Download, Loader2, Play, Trash2, X } from "lucide-react";
+import { useOptimistic, useRef, useState, useTransition } from "react";
+import { Check, CheckSquare, Download, Loader2, Mic, Pause, Play, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/confirm-provider";
@@ -276,14 +276,17 @@ export function GalleryGrid({
             >
               <button
                 type="button"
-                onClick={() => (selecting ? toggle(item.id) : setOpenIndex(index))}
+                onClick={() => (selecting ? toggle(item.id) : item.kind !== "audio" ? setOpenIndex(index) : undefined)}
                 aria-label={t.gallery.from(item.guestName)}
                 aria-pressed={selecting ? isSelected : undefined}
-                className={cn("block size-full transition duration-150 active:scale-[0.97]", selecting ? "cursor-pointer" : "cursor-zoom-in")}
+                className={cn(
+                  "block size-full transition duration-150 active:scale-[0.97]",
+                  selecting ? "cursor-pointer" : item.kind === "audio" ? "cursor-default" : "cursor-zoom-in",
+                )}
               >
                 {item.kind === "image" ? (
                   <img src={item.url} alt="" loading="lazy" className="size-full object-cover" />
-                ) : (
+                ) : item.kind === "video" ? (
                   <>
                     {/* #t=0.1 makes browsers show the first frame as a poster */}
                     <video src={`${item.url}#t=0.1`} preload="metadata" muted playsInline className="size-full object-cover" />
@@ -291,6 +294,8 @@ export function GalleryGrid({
                       <Play className="size-4 fill-current" aria-hidden />
                     </span>
                   </>
+                ) : (
+                  <AudioTile url={item.url} />
                 )}
                 {selecting && (
                   <span
@@ -350,6 +355,45 @@ export function GalleryGrid({
           subtitle={(item) => timeFormat.format(new Date(item.createdAt))}
         />
       )}
+    </div>
+  );
+}
+
+// Audio has no thumbnail — a plain tile with an inline play/pause control instead.
+function AudioTile({ url }: { url: string }) {
+  const ref = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  return (
+    <div className="grid size-full place-items-center bg-gradient-to-br from-primary to-blaze text-cream">
+      <audio ref={ref} src={url} onEnded={() => setPlaying(false)} className="hidden" />
+      <span className="pointer-events-none absolute top-3 left-3 opacity-70 sm:top-4 sm:left-4">
+        <Mic className="size-4" aria-hidden />
+      </span>
+      {/* span, not a nested <button> — this tile already sits inside the tile's own button */}
+      <span
+        role="button"
+        tabIndex={0}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (playing) {
+            ref.current?.pause();
+            setPlaying(false);
+          } else {
+            ref.current?.play();
+            setPlaying(true);
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          e.preventDefault();
+          e.stopPropagation();
+          e.currentTarget.click();
+        }}
+        className="grid size-12 cursor-pointer place-items-center rounded-full bg-cream/90 text-ink transition active:scale-90"
+      >
+        {playing ? <Pause className="size-5 fill-current" aria-hidden /> : <Play className="size-5 fill-current" aria-hidden />}
+      </span>
     </div>
   );
 }

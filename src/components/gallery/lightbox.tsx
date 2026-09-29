@@ -107,7 +107,7 @@ export function Lightbox({
               closing ? "animate-out duration-200 fade-out zoom-out-95 fill-mode-forwards" : "animate-in duration-300 fade-in zoom-in-95",
             )}
           />
-        ) : (
+        ) : item.kind === "video" ? (
           <video
             key={item.id}
             src={item.url}
@@ -121,6 +121,8 @@ export function Lightbox({
               {t.gallery.download}
             </a>
           </video>
+        ) : (
+          <audio key={item.id} src={item.url} controls autoPlay className="w-full max-w-md" />
         )}
 
         {hasPrev && (
