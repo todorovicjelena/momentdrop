@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { EVENT_TYPES, SLUG_PATTERN, type EventType } from "@/lib/events";
 import { storageExpiresAt } from "@/lib/plans";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export type CreateEventState = { error?: string; field?: "title" | "slug" | "type"; suggestion?: string } | undefined;
 
@@ -35,9 +35,8 @@ export async function checkSlug(slug: string): Promise<SlugCheck> {
   return suggestion ? { status: "taken", suggestion } : { status: "free" };
 }
 
-const errors = t.newEvent.errors;
-
 export async function createEvent(_prev: CreateEventState, formData: FormData): Promise<CreateEventState> {
+  const errors = (await getT()).newEvent.errors;
   const { supabase } = await requireUser("/dashboard/new");
 
   const title = String(formData.get("title") ?? "").trim();

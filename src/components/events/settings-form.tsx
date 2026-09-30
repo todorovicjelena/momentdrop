@@ -15,7 +15,7 @@ import { updateEvent, type SettingsState } from "@/app/dashboard/events/[id]/act
 import { BRAND_COLORS, todayLocal, type EventType } from "@/lib/events";
 import type { Plan } from "@/lib/plans";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 export type SettingsFormEvent = {
   id: string;
@@ -35,6 +35,7 @@ export type SettingsFormEvent = {
 };
 
 export function SettingsForm({ event }: { event: SettingsFormEvent }) {
+  const t = useT();
   const [state, formAction] = useActionState<SettingsState, FormData>(updateEvent.bind(null, event.id), undefined);
   const [pending, startTransition] = useTransition();
   const [type, setType] = useState<EventType>(event.event_type);

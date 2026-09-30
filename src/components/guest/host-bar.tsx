@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Images, Settings } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 // Shown on guest pages only to the event's owner, as a shortcut back to the dashboard.
 export async function HostBar({ slug }: { slug: string }) {
+  const t = await getT();
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims) return null;

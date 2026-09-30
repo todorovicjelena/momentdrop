@@ -7,21 +7,22 @@ import { GuestUploader } from "@/components/guest/guest-uploader";
 import { GuestNotice, GuestShell } from "@/components/guest/guest-shell";
 import { getPublicEvent } from "@/lib/public-event";
 import { formatEventDate, isUploadClosed } from "@/lib/events";
-import { t } from "@/lib/i18n";
+import { intlLocale } from "@/lib/i18n";
+import { getLocale, getT } from "@/lib/i18n/server";
 
 export async function generateMetadata({ params }: PageProps<"/event/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const event = await getPublicEvent(slug);
+  const [event, t] = await Promise.all([getPublicEvent(slug), getT()]);
   return { title: event?.title ?? t.guest.notFoundTitle, robots: { index: false } };
 }
 
 // Guest page (no account needed): event branding + photo/video upload.
 export default async function GuestEventPage({ params }: PageProps<"/event/[slug]">) {
   const { slug } = await params;
-  const event = await getPublicEvent(slug);
+  const [event, t, locale] = await Promise.all([getPublicEvent(slug), getT(), getLocale()]);
   if (!event) notFound();
 
-  const date = formatEventDate(event.event_date);
+  const date = formatEventDate(event.event_date, intlLocale[locale]);
 
   return (
     <GuestShell event={event} enter="slide-in-from-bottom-4 fade-in" className="items-center px-5 text-center">

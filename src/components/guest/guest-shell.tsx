@@ -3,12 +3,12 @@ import { GuestTabs } from "@/components/guest/guest-tabs";
 import { HostBar } from "@/components/guest/host-bar";
 import type { PublicEvent } from "@/lib/public-event";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 // Frame shared by all guest pages: host shortcut bar, the event's color,
 // swirl (or, on paid plans, a custom) background, "Pošalji · Galerija" tabs
 // and the brand footer.
-export function GuestShell({
+export async function GuestShell({
   event,
   className,
   enter = "fade-in",
@@ -22,6 +22,7 @@ export function GuestShell({
   enter?: string;
   children: React.ReactNode;
 }) {
+  const t = await getT();
   return (
     <>
       <HostBar slug={event.slug} />

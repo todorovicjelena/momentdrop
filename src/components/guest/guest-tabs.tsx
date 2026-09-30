@@ -1,9 +1,10 @@
 import { ImagePlus, Images } from "lucide-react";
 import { NavTabs } from "@/components/nav-tabs";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 // "Pošalji · Galerija" for guests — only rendered when the host allows the gallery.
-export function GuestTabs({ slug }: { slug: string }) {
+export async function GuestTabs({ slug }: { slug: string }) {
+  const t = await getT();
   return (
     <NavTabs
       className="mx-auto"

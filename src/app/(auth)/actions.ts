@@ -5,13 +5,12 @@ import type { AuthError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { safeNext } from "@/lib/safe-next";
 import { getOrigin } from "@/lib/origin";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
+import type { Messages } from "@/lib/i18n";
 
 export type AuthState = { error?: string; checkEmail?: boolean } | undefined;
 
-const errors = t.auth.errors;
-
-function mapError(error: AuthError): string {
+function mapError(error: AuthError, errors: Messages["auth"]["errors"]): string {
   switch (error.code) {
     case "invalid_credentials":
       return errors.invalidCredentials;
@@ -34,17 +33,19 @@ function mapError(error: AuthError): string {
 }
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const errors = (await getT()).auth.errors;
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: mapError(error) };
+  if (error) return { error: mapError(error, errors) };
 
   redirect(safeNext(formData.get("next")));
 }
 
 export async function signup(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const errors = (await getT()).auth.errors;
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -62,7 +63,7 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
       emailRedirectTo: `${await getOrigin()}/auth/callback?next=/dashboard`,
     },
   });
-  if (error) return { error: mapError(error) };
+  if (error) return { error: mapError(error, errors) };
 
   // With email confirmation enabled there is no session yet.
   if (!data.session) return { checkEmail: true };

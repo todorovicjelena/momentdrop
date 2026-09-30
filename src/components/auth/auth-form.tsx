@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { FormError, FormField } from "@/components/form-field";
 import { login, signup, type AuthState } from "@/app/(auth)/actions";
 import { GoogleButton } from "./google-button";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 // Turn on once the Google provider is configured in Supabase.
 const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
@@ -20,6 +20,7 @@ type Props = {
 };
 
 export function AuthForm({ mode, next, initialError }: Props) {
+  const t = useT();
   const isSignup = mode === "signup";
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     isSignup ? signup : login,

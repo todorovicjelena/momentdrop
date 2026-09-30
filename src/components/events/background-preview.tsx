@@ -1,11 +1,13 @@
+"use client";
+
 import { Camera } from "lucide-react";
 import { Swirls } from "@/components/swirls";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 // Small before/after teaser shown to free-plan hosts, next to the locked
 // "puna pozadina" upload — makes the upsell concrete instead of just text.
 export function BackgroundPreview() {
-  const c = t.settings;
+  const c = useT().settings;
   return (
     <div className="grid grid-cols-2 gap-3">
       <div className="flex flex-col gap-1.5">

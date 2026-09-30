@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/confirm-provider";
 import type { UploadItem } from "@/hooks/use-guest-uploads";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
-
-const g = t.guest;
+import { useT } from "@/components/i18n-provider";
 
 // One file in the guest's upload list: preview, status/progress, retry or delete.
 export function UploadRow({ item, onRetry, onDelete }: { item: UploadItem; onRetry: () => void; onDelete: () => void }) {
+  const t = useT();
+  const g = t.guest;
   const confirm = useConfirm();
   const label =
     item.status === "uploading" ? `${g.status.uploading} ${item.progress}%` : item.error ?? g.status[item.status];

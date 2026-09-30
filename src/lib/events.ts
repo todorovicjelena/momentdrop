@@ -37,11 +37,11 @@ export function monogram(title: string): [string, string?] {
   return [first, second];
 }
 
-export function formatEventDate(date: string | null) {
+export function formatEventDate(date: string | null, intlLocale = "sr-Latn-RS") {
   if (!date) return null;
   // Dates are stored as YYYY-MM-DD; parse as local date to avoid timezone shifts.
   const [y, m, d] = date.split("-").map(Number);
-  return new Intl.DateTimeFormat("sr-Latn-RS", { day: "numeric", month: "long", year: "numeric" }).format(
+  return new Intl.DateTimeFormat(intlLocale, { day: "numeric", month: "long", year: "numeric" }).format(
     new Date(y, m - 1, d),
   );
 }

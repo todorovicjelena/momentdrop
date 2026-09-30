@@ -11,9 +11,7 @@ import { AudioRecorder } from "./audio-recorder";
 import { UploadRow } from "./upload-row";
 import type { Plan } from "@/lib/plans";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
-
-const g = t.guest;
+import { useT } from "@/components/i18n-provider";
 
 export function GuestUploader({
   slug,
@@ -74,6 +72,7 @@ function Uploader({
   onChangeName: () => void;
   canRecordAudio: boolean;
 }) {
+  const g = useT().guest;
   const { items, addFiles, retry, removeSent, clear, done, failed, retryable, busy } = useGuestUploads(slug);
   const allFinished = items.length > 0 && !busy;
 
@@ -159,6 +158,7 @@ function Uploader({
 }
 
 function GalleryLink({ href }: { href: string }) {
+  const g = useT().guest;
   return (
     <Link href={href} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full border-2")}>
       <Images aria-hidden />

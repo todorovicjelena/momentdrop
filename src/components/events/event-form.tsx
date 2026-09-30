@@ -12,10 +12,11 @@ import { useSlugFromTitle } from "@/hooks/use-slug-from-title";
 import { useSlugAvailability } from "@/hooks/use-slug-availability";
 import { todayLocal, type EventType } from "@/lib/events";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 // linkPrefix: what guests' links start with, e.g. "momentdrop.rs/event/"
 export function EventForm({ linkPrefix }: { linkPrefix: string }) {
+  const t = useT();
   const [state, formAction, pending] = useActionState<CreateEventState, FormData>(createEvent, undefined);
   const [type, setType] = useState<EventType>("wedding");
   const [date, setDate] = useState("");
@@ -93,6 +94,7 @@ function SlugStatus({
   suggestion?: string;
   onUse: (slug: string) => void;
 }) {
+  const t = useT();
   if (suggestion) {
     return (
       <button

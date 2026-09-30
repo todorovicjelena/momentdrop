@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: t.legal.privacy.title };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT()).legal.privacy.title };
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const t = await getT();
   return <LegalPage content={t.legal.privacy} />;
 }

@@ -7,7 +7,7 @@ import { confirmGuestUpload, deleteMyUpload, presignGuestUpload } from "@/app/ev
 import { guestToken } from "@/hooks/use-stored-value";
 import { putWithProgress } from "@/lib/upload-client";
 import { fileExtension, fileKind, maxBytes, maxMb, toMb, UPLOAD_LIMITS, type FileKind } from "@/lib/uploads";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 export type UploadStatus = "waiting" | "preparing" | "uploading" | "done" | "error";
 
@@ -25,7 +25,6 @@ export type UploadItem = {
 
 // Weak signal at venues: 2 parallel uploads is a good balance.
 const CONCURRENCY = 2;
-const errors = t.guest.errors;
 
 // Some browsers leave file.type empty for HEIC / MOV — fall back to the extension.
 function mimeOf(file: File) {
@@ -94,6 +93,8 @@ async function prepareImage(file: File, mime: string): Promise<File | Blob> {
 type Identity = { guestName: string; pin: string };
 
 export function useGuestUploads(slug: string) {
+  const t = useT();
+  const errors = t.guest.errors;
   const [items, setItems] = useState<UploadItem[]>([]);
   // Source of truth lives in refs so async tasks always see fresh data.
   const itemsRef = useRef<UploadItem[]>([]);
@@ -163,7 +164,7 @@ export function useGuestUploads(slug: string) {
         fail(errors.failed);
       }
     },
-    [slug, update],
+    [slug, update, errors],
   );
 
   const pump = useCallback(() => {
@@ -212,7 +213,7 @@ export function useGuestUploads(slug: string) {
       setItems(itemsRef.current);
       pump();
     },
-    [pump],
+    [pump, errors],
   );
 
   const retry = useCallback(
@@ -243,7 +244,7 @@ export function useGuestUploads(slug: string) {
       itemsRef.current = itemsRef.current.filter((it) => it.id !== id);
       setItems(itemsRef.current);
     },
-    [slug],
+    [slug, t],
   );
 
   const clear = useCallback(() => {

@@ -7,11 +7,14 @@ import { PageTransition } from "@/components/page-transition";
 import { DancingFlowers } from "@/components/dancing-flowers";
 import { buttonVariants } from "@/components/ui/button";
 import type { EventRow } from "@/lib/events";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: t.dashboard.title };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT()).dashboard.title };
+}
 
 export default async function DashboardPage() {
+  const t = await getT();
   const { supabase, claims } = await requireUser("/dashboard");
 
   // RLS returns only this user's events.

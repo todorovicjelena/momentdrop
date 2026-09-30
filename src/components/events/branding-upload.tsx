@@ -7,7 +7,7 @@ import { FormError } from "@/components/form-field";
 import { useBrandingUpload } from "@/hooks/use-branding-upload";
 import { BRANDING, type BrandingKind } from "@/lib/events";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 // Logo (round) or cover (wide) picker with live preview and upload progress.
 export function BrandingUpload({
@@ -19,6 +19,7 @@ export function BrandingUpload({
   kind: BrandingKind;
   initialUrl: string | null;
 }) {
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const { previewUrl, uploading, progress, error, upload, remove } = useBrandingUpload(eventId, kind, initialUrl);
   const isLogo = kind === "logo";

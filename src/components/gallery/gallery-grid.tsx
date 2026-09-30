@@ -19,7 +19,8 @@ import type { FileKind } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 import type { ActionResult } from "@/lib/result";
 import { Lightbox } from "./lightbox";
-import { t } from "@/lib/i18n";
+import { intlLocale } from "@/lib/i18n";
+import { useLocale, useT } from "@/components/i18n-provider";
 
 export type GalleryItem = {
   id: string;
@@ -35,22 +36,14 @@ export type GalleryItem = {
 // How long a tile's shrink-and-fade runs before it's removed from the list.
 const EXIT_MS = 260;
 
-const timeFormat = new Intl.DateTimeFormat("sr-Latn-RS", {
-  day: "numeric",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "Europe/Belgrade",
-});
-
 // Grid + viewer + "download all / select" toolbar.
 // Tiles with `canDelete` can be deleted via `onDelete`
 // (host: any file of their event; guest: only their own files).
 export function GalleryGrid({
   items,
   onDelete,
-  confirmText = t.gallery.confirmDelete,
-  confirmHint = t.gallery.cannotUndo,
+  confirmText,
+  confirmHint,
   zipName,
 }: {
   items: GalleryItem[];
@@ -59,6 +52,17 @@ export function GalleryGrid({
   confirmHint?: string;
   zipName: string;
 }) {
+  const t = useT();
+  const locale = useLocale();
+  const resolvedConfirmText = confirmText ?? t.gallery.confirmDelete;
+  const resolvedConfirmHint = confirmHint ?? t.gallery.cannotUndo;
+  const timeFormat = new Intl.DateTimeFormat(intlLocale[locale], {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Belgrade",
+  });
   const confirm = useConfirm();
   // Hide deleted tiles immediately; the server refresh confirms it.
   const [visible, removeOptimistic] = useOptimistic(items, (state, ids: string[]) =>
@@ -97,7 +101,7 @@ export function GalleryGrid({
 
   async function removeOne(id: string) {
     if (!onDelete) return;
-    if (!(await confirm({ title: confirmText, description: confirmHint, confirmLabel: t.common.delete, destructive: true }))) return;
+    if (!(await confirm({ title: resolvedConfirmText, description: resolvedConfirmHint, confirmLabel: t.common.delete, destructive: true }))) return;
     // In the viewer: step back if we deleted the last item, close if nothing is left.
     if (openIndex !== null) {
       const remaining = visible.length - 1;
@@ -238,7 +242,7 @@ export function GalleryGrid({
                 onClick={async () => {
                   const ok = await confirm({
                     title: t.gallery.confirmDeleteMany(deletableSelected.length),
-                    description: confirmHint,
+                    description: resolvedConfirmHint,
                     confirmLabel: t.common.delete,
                     destructive: true,
                   });

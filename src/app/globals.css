@@ -137,6 +137,39 @@
 }
 
 /* ── Motion ──────────────────────────────────────────────────────────────── */
+/* Liquid merge for the SR/EN language toggle: the active dot stretches into
+   a pill that bridges both positions, then contracts back down over the
+   newly-active dot - like two drops of liquid merging and splitting. */
+@keyframes bridge-expand {
+  0% {
+    left: 0;
+    width: 2rem;
+  }
+  45% {
+    left: 0;
+    width: 5rem;
+  }
+  100% {
+    left: calc(100% - 2rem);
+    width: 2rem;
+  }
+}
+
+@keyframes bridge-expand-from-en {
+  0% {
+    left: calc(100% - 2rem);
+    width: 2rem;
+  }
+  45% {
+    left: 0;
+    width: 5rem;
+  }
+  100% {
+    left: 0;
+    width: 2rem;
+  }
+}
+
 /* Motion sickness: kill every animation and transition for people who ask. */
 @media (prefers-reduced-motion: reduce) {
   *,
