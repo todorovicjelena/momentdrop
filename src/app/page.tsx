@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { SiteShell } from "@/components/site-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
 import { LanguageToggle } from "@/components/language-toggle";
 import { DancingFlowers } from "@/components/dancing-flowers";
+import { FaqAccordion } from "@/components/faq-accordion";
 import { cn } from "@/lib/utils";
 import { getT } from "@/lib/i18n/server";
 
@@ -145,17 +146,7 @@ export default async function Home() {
         <p className="text-center font-semibold tracking-wide text-primary">{faq.kicker}</p>
         <h2 className="mt-2 text-center font-serif text-3xl leading-[0.95] sm:text-5xl">{faq.title}</h2>
 
-        <div className="mx-auto mt-10 flex max-w-3xl flex-col gap-3">
-          {faq.items.map((item) => (
-            <details key={item.q} className="group rounded-[1.5rem] bg-lilac-soft p-5 open:pb-5 sm:p-6">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
-                {item.q}
-                <ChevronDown className="size-5 shrink-0 text-muted-foreground transition group-open:rotate-180" aria-hidden />
-              </summary>
-              <p className="mt-3 text-muted-foreground">{item.a}</p>
-            </details>
-          ))}
-        </div>
+        <FaqAccordion items={faq.items} />
       </div>
     </section>
 
