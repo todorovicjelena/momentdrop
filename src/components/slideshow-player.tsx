@@ -3,13 +3,14 @@
 /* eslint-disable @next/next/no-img-element -- presigned R2 URLs, not optimizable by next/image */
 import { useEffect, useState } from "react";
 import { getSlideshowItems, type SlideshowItem } from "@/app/slideshow/[id]/actions";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 const ADVANCE_MS = 7000; // per image; videos advance on their own when they end
 const POLL_MS = 20000; // pick up new guest uploads without a manual refresh
 
 // Full-screen, unattended photo/video cycle for a TV or projector.
 export function SlideshowPlayer({ eventId, title }: { eventId: string; title: string }) {
+  const t = useT();
   const [items, setItems] = useState<SlideshowItem[]>([]);
   const [index, setIndex] = useState(0);
 

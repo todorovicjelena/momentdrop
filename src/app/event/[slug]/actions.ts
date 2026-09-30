@@ -10,16 +10,16 @@ import type { ActionResult } from "@/lib/result";
 import { brandingKeyPrefix, isUploadClosed } from "@/lib/events";
 import { EXTENSIONS, fileKind, GUEST_NAME_MAX, guestKeyPrefix, maxBytes, maxMb, toMb, UPLOAD_LIMITS, type FileKind } from "@/lib/uploads";
 import { PLAN_LIMITS, type Plan } from "@/lib/plans";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 // Guests have no account: every action re-checks the event, PIN and limits.
 // Writes go through the admin (secret key) client — the uploads table has no
 // insert policy for anonymous users on purpose.
 
-const errors = t.guest.errors;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function openEvent(slug: string, pin: string): Promise<ActionResult<{ id: string; plan: Plan }>> {
+  const errors = (await getT()).guest.errors;
   const { data: event } = await createAdminClient()
     .from("events")
     .select("id, uploads_open, upload_deadline, pin_hash, plan, storage_expires_at")
@@ -51,6 +51,7 @@ async function eventFileCount(eventId: string) {
 
 // Name + PIN step: lets the guest know right away if the PIN is wrong.
 export async function checkGuestAccess(slug: string, pin: string): Promise<ActionResult> {
+  const errors = (await getT()).guest.errors;
   if (!(await rateLimit("pin", 30))) return { ok: false, error: errors.rateLimit };
   const result = await openEvent(slug, pin);
   return result.ok ? { ok: true } : result;
@@ -59,6 +60,7 @@ export async function checkGuestAccess(slug: string, pin: string): Promise<Actio
 type PresignInput = { guestToken: string; pin: string; mime: string; size: number; durationSeconds?: number };
 
 export async function presignGuestUpload(slug: string, input: PresignInput): Promise<ActionResult<{ url: string; key: string }>> {
+  const errors = (await getT()).guest.errors;
   if (!(await rateLimit("presign", 150))) return { ok: false, error: errors.rateLimit };
   if (!UUID.test(input.guestToken)) return { ok: false, error: errors.failed };
 
@@ -103,6 +105,7 @@ type ConfirmInput = {
 };
 
 export async function confirmGuestUpload(slug: string, input: ConfirmInput): Promise<ActionResult<{ id: string }>> {
+  const errors = (await getT()).guest.errors;
   const kind = fileKind(input.mime);
   const guestName = input.guestName.trim().slice(0, GUEST_NAME_MAX);
   if (!kind || !guestName || !UUID.test(input.guestToken)) return { ok: false, error: errors.failed };
@@ -153,6 +156,7 @@ export async function deleteMyUpload(
   slug: string,
   input: { uploadId: string; guestToken: string; pin: string },
 ): Promise<ActionResult> {
+  const errors = (await getT()).guest.errors;
   if (!(await rateLimit("delete", 100))) return { ok: false, error: errors.rateLimit };
   if (!UUID.test(input.guestToken) || !UUID.test(input.uploadId)) return { ok: false, error: errors.deleteFailed };
 
@@ -193,6 +197,8 @@ export async function listGuestGallery(
   pin: string,
   guestToken?: string,
 ): Promise<ActionResult<{ items: GuestGalleryItem[] }>> {
+  const t = await getT();
+  const errors = t.guest.errors;
   if (!(await rateLimit("gallery", 120))) return { ok: false, error: errors.rateLimit };
 
   const db = createAdminClient();

@@ -6,9 +6,11 @@ import { SettingsForm } from "@/components/events/settings-form";
 import { PlanCard } from "@/components/events/plan-card";
 import { PageTransition } from "@/components/page-transition";
 import type { Plan } from "@/lib/plans";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: t.settings.title };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT()).settings.title };
+}
 
 // Title, tabs and guest link come from ./layout.tsx.
 export default async function EventSettingsPage({ params }: PageProps<"/dashboard/events/[id]">) {

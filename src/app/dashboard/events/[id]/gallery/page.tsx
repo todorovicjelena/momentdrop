@@ -9,9 +9,11 @@ import { PageTransition } from "@/components/page-transition";
 import { deleteUpload } from "./actions";
 import { DancingFlowers } from "@/components/dancing-flowers";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: t.gallery.title };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT()).gallery.title };
+}
 
 type UploadRow = {
   id: string;
@@ -24,8 +26,10 @@ type UploadRow = {
 
 const FILTERS = ["all", "image", "video", "audio"] as const;
 type Filter = (typeof FILTERS)[number];
+const ZIP_SUFFIX: Record<Filter, string> = { all: "", image: "-photos", video: "-video", audio: "-audio" };
 
 export default async function GalleryPage({ params, searchParams }: PageProps<"/dashboard/events/[id]/gallery">) {
+  const t = await getT();
   const { id } = await params;
   const { type } = await searchParams;
   const filter: Filter = type === "image" || type === "video" || type === "audio" ? type : "all";
@@ -51,7 +55,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
   // Short-lived signed links: one to view, one that downloads with a readable name.
   const items: GalleryItem[] = await Promise.all(
     shown.map(async (u, i) => {
-      const name = mediaFileName([event.slug, slugify(u.guest_name) || "gost", shown.length - i], u.mime_type);
+      const name = mediaFileName([event.slug, slugify(u.guest_name) || "guest", shown.length - i], u.mime_type);
       const { url, downloadUrl } = await signMedia(u.r2_key, name);
       return {
         id: u.id,
@@ -85,11 +89,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
       </nav>
 
       {items.length > 0 ? (
-        <GalleryGrid
-          items={items}
-          onDelete={deleteUpload.bind(null, event.id)}
-          zipName={`${event.slug}${filter === "all" ? "" : filter === "image" ? "-slike" : filter === "video" ? "-video" : "-audio"}.zip`}
-        />
+        <GalleryGrid items={items} onDelete={deleteUpload.bind(null, event.id)} zipName={`${event.slug}${ZIP_SUFFIX[filter]}.zip`} />
       ) : (
         <div className="flex flex-col items-center gap-3 rounded-[2rem] bg-card px-6 py-12 text-center shadow-sm">
           <DancingFlowers className="w-48" />

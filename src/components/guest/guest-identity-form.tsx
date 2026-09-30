@@ -7,9 +7,7 @@ import { Input } from "@/components/ui/input";
 import { FormError, FormField } from "@/components/form-field";
 import { checkGuestAccess } from "@/app/event/[slug]/actions";
 import { GUEST_NAME_MAX } from "@/lib/uploads";
-import { t } from "@/lib/i18n";
-
-const g = t.guest;
+import { useT } from "@/components/i18n-provider";
 
 // Guest's name (and the event PIN, if set) before they can upload.
 export function IdentityForm({
@@ -23,6 +21,7 @@ export function IdentityForm({
   initialName: string;
   onDone: (name: string, pin: string) => void;
 }) {
+  const g = useT().guest;
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 

@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthForm } from "@/components/auth/auth-form";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: t.nav.login };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT()).nav.login };
+}
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  const t = await getT();
   const { next, error } = await searchParams;
 
   return (

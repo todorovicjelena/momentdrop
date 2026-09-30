@@ -4,13 +4,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { SiteShell } from "@/components/site-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
+import { LanguageToggle } from "@/components/language-toggle";
 import { DancingFlowers } from "@/components/dancing-flowers";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 const BUSINESS_CONTACT = "mailto:usemomentdrop@gmail.com";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getT();
   const howItWorks = t.marketing.howItWorks;
   const pricing = t.marketing.pricing;
   const faq = t.marketing.faq;
@@ -31,6 +33,7 @@ export default function Home() {
               {t.marketing.nav.faq}
             </Link>
           </nav>
+          <LanguageToggle />
           <SiteMobileNav />
         </>
       }

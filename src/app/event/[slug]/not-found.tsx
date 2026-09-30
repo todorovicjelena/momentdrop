@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Swirls } from "@/components/swirls";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export default function EventNotFound() {
+export default async function EventNotFound() {
+  const t = await getT();
   return (
     <main className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden px-5 py-16 text-center text-cream">
       <Swirls />

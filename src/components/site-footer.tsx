@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 // Link list shared by the home page and every marketing/legal page.
-export function SiteFooter() {
-  const nav = t.marketing.nav;
+export async function SiteFooter() {
+  const nav = (await getT()).marketing.nav;
   return (
     <footer className="mx-auto mt-8 w-full max-w-6xl px-4 pb-8">
       <div className="flex flex-col gap-6 rounded-[2rem] bg-card px-6 py-8 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:px-10">

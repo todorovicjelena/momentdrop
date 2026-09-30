@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { deleteObject } from "@/lib/r2";
 import type { ActionResult } from "@/lib/result";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export async function deleteUpload(eventId: string, uploadId: string): Promise<ActionResult> {
+  const t = await getT();
   const { supabase } = await requireUser(`/dashboard/events/${eventId}/gallery`);
 
   // RLS: the row comes back (and can be deleted) only if the event is yours.

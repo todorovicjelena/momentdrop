@@ -3,7 +3,7 @@
 import { Cake, Church, Gem, PartyPopper } from "lucide-react";
 import { EVENT_TYPES, type EventType } from "@/lib/events";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 const TYPE_ICONS: Record<EventType, typeof Gem> = {
   wedding: Gem,
@@ -14,6 +14,7 @@ const TYPE_ICONS: Record<EventType, typeof Gem> = {
 
 // Four big radio "cards" (submitted as `event_type`).
 export function EventTypePicker({ value, onChange }: { value: EventType; onChange: (value: EventType) => void }) {
+  const t = useT();
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="mb-2 pl-1 text-sm font-semibold">{t.newEvent.type}</legend>

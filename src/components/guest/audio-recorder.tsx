@@ -5,13 +5,12 @@ import { Mic, RotateCcw, Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-field";
 import { UPLOAD_LIMITS } from "@/lib/uploads";
-import { t } from "@/lib/i18n";
-
-const a = t.guest.audio;
+import { useT } from "@/components/i18n-provider";
 
 // Records a short voice message via MediaRecorder and hands the finished
 // file to `onRecorded` — the caller uploads it through the normal pipeline.
 export function AudioRecorder({ onRecorded }: { onRecorded: (file: File) => void }) {
+  const a = useT().guest.audio;
   const [status, setStatus] = useState<"idle" | "recording" | "recorded">("idle");
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string>();

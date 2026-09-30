@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "
 import { DemoBackground } from "@/components/events/demo-background";
 import { BRAND_COLORS } from "@/lib/events";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 // Numbered placeholder tiles instead of real photos — we don't have any to
 // show, and picking real ones (someone's actual event, a stock photo) would
@@ -18,6 +18,7 @@ const TILE_COLORS = BRAND_COLORS;
 // free-plan host see the actual look (both the send screen and the gallery)
 // before paying for it, not just read about it.
 export function BackgroundPreviewDialog() {
+  const t = useT();
   const c = t.settings;
   const [tab, setTab] = useState<"send" | "gallery">("send");
 

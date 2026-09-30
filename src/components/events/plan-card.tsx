@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-field";
 import { createUpgradeCheckout } from "@/app/dashboard/events/[id]/actions";
 import { PAID_PLANS, PLAN_LIMITS, PLAN_PRICE_EUR, type Plan, type PaidPlan } from "@/lib/plans";
-import { t } from "@/lib/i18n";
-
-const formatDate = (iso: string) => new Intl.DateTimeFormat("sr-Latn-RS", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
+import { intlLocale } from "@/lib/i18n";
+import { useLocale, useT } from "@/components/i18n-provider";
 
 export function PlanCard({ eventId, plan, uploadCount, storageExpiresAt }: { eventId: string; plan: Plan; uploadCount: number; storageExpiresAt: string | null }) {
+  const t = useT();
+  const locale = useLocale();
+  const formatDate = (iso: string) => new Intl.DateTimeFormat(intlLocale[locale], { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
   const [pendingPlan, setPendingPlan] = useState<PaidPlan | null>(null);
   const [error, setError] = useState<string>();
   const tp = t.settings.plan;

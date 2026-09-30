@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree, Gloock } from "next/font/google";
 import { ConfirmProvider } from "@/components/confirm-provider";
+import { I18nProvider } from "@/components/i18n-provider";
 import { Toaster } from "@/components/toaster";
 import { TouchActive } from "@/components/touch-active";
-import { t } from "@/lib/i18n";
+import { getMessages } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n/server";
 import "./globals.css";
 
 // latin-ext is needed for č, ć, š, ž, đ
@@ -24,19 +26,25 @@ const serif = Gloock({
   subsets: ["latin", "latin-ext"],
 });
 
-export const metadata: Metadata = {
-  title: { default: t.app.name, template: `%s · ${t.app.name}` },
-  description: t.app.tagline,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale());
+  return {
+    title: { default: t.app.name, template: `%s · ${t.app.name}` },
+    description: t.app.tagline,
+  };
+}
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
   return (
-    <html lang="sr-Latn" className={`${body.variable} ${display.variable} ${serif.variable} h-full antialiased`}>
+    <html lang={locale === "en" ? "en" : "sr-Latn"} className={`${body.variable} ${display.variable} ${serif.variable} h-full antialiased`}>
       {/* suppressHydrationWarning: browser extensions (e.g. Grammarly) add attributes to <body> */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
-        <ConfirmProvider>{children}</ConfirmProvider>
-        <Toaster />
-        <TouchActive />
+        <I18nProvider locale={locale}>
+          <ConfirmProvider>{children}</ConfirmProvider>
+          <Toaster />
+          <TouchActive />
+        </I18nProvider>
       </body>
     </html>
   );

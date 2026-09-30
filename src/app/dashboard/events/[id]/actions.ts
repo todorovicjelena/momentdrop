@@ -18,15 +18,15 @@ import { createCheckout } from "@/lib/lemonsqueezy";
 import { getOrigin } from "@/lib/origin";
 import { PLAN_LIMITS, type PaidPlan } from "@/lib/plans";
 import type { ActionResult } from "@/lib/result";
-import { t } from "@/lib/i18n";
-
-const errors = t.settings.errors;
+import { getT } from "@/lib/i18n/server";
 
 export type SettingsState = { error?: string; saved?: boolean } | undefined;
 
 // ─── Event settings form ────────────────────────────────────────────────────
 
 export async function updateEvent(eventId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {
+  const t = await getT();
+  const errors = t.settings.errors;
   const { supabase } = await requireUser(`/dashboard/events/${eventId}`);
 
   // RLS: returns the row only if it belongs to the current user.
@@ -105,6 +105,7 @@ export async function presignBrandingUpload(
   contentType: string,
   size: number,
 ): Promise<ActionResult<{ url: string; key: string }>> {
+  const errors = (await getT()).settings.errors;
   const { event } = await ownedEvent(eventId);
   if (!event) return { ok: false, error: errors.notFound };
   if (!BRANDING.kinds.includes(kind)) return { ok: false, error: errors.uploadFailed };
@@ -124,6 +125,7 @@ export async function saveBrandingImage(
   kind: BrandingKind,
   key: string,
 ): Promise<ActionResult<{ previewUrl: string }>> {
+  const errors = (await getT()).settings.errors;
   const { supabase, event } = await ownedEvent(eventId);
   if (!event) return { ok: false, error: errors.notFound };
   if (!key.startsWith(`${brandingKeyPrefix(eventId)}${kind}-`)) return { ok: false, error: errors.uploadFailed };
@@ -150,6 +152,7 @@ export async function saveBrandingImage(
 }
 
 export async function removeBrandingImage(eventId: string, kind: BrandingKind): Promise<ActionResult> {
+  const errors = (await getT()).settings.errors;
   const { supabase, event } = await ownedEvent(eventId);
   if (!event) return { ok: false, error: errors.notFound };
 
@@ -169,6 +172,7 @@ export async function removeBrandingImage(eventId: string, kind: BrandingKind): 
 // paid plan. The event's plan flips once Lemon Squeezy confirms payment via
 // webhook — see src/app/api/lemonsqueezy/webhook/route.ts.
 export async function createUpgradeCheckout(eventId: string, plan: PaidPlan): Promise<ActionResult<{ url: string }>> {
+  const errors = (await getT()).settings.errors;
   const { supabase } = await requireUser(`/dashboard/events/${eventId}`);
   const { data: event } = await supabase.from("events").select("id, plan").eq("id", eventId).maybeSingle();
   if (!event) return { ok: false, error: errors.notFound };

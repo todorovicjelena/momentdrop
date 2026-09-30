@@ -5,10 +5,11 @@ import { getOrigin } from "@/lib/origin";
 import { NavTabs } from "@/components/nav-tabs";
 import { CopyButton } from "@/components/copy-button";
 import { QrCodeDialog } from "@/components/events/qr-code-dialog";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 // Shared frame for one event: breadcrumb, title, guest link and tabs.
 export default async function EventLayout({ params, children }: LayoutProps<"/dashboard/events/[id]">) {
+  const t = await getT();
   const { id } = await params;
   const { supabase, event } = await getOwnedEvent(id);
   const base = `/dashboard/events/${event.id}`;

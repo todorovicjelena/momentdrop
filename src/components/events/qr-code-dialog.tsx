@@ -9,9 +9,8 @@ import { Input } from "@/components/ui/input";
 import { triggerDownload } from "@/lib/download";
 import { useClosing, useModal } from "@/hooks/use-modal";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
-
-const q = t.qr;
+import { useT } from "@/components/i18n-provider";
+import type { Messages } from "@/lib/i18n";
 
 // Everything the guest needs is in the URL, so the QR is made entirely in the
 // browser. We draw one "table card" (title + QR + instructions + optional PIN)
@@ -85,7 +84,7 @@ const SWIRLS: [string, number][] = [
   ["M430 930C520 760 700 700 820 780", 100],
 ];
 
-async function buildCard(url: string, title: string, pin: string): Promise<string> {
+async function buildCard(url: string, title: string, pin: string, q: Messages["qr"], appName: string): Promise<string> {
   const W = 1080;
   const H = 1500;
   const px = 40;
@@ -182,7 +181,7 @@ async function buildCard(url: string, title: string, pin: string): Promise<strin
   ls.letterSpacing = "1px";
   ctx.fillStyle = CREAM;
   ctx.font = "800 26px system-ui, -apple-system, sans-serif";
-  ctx.fillText(`${t.app.name} · ${q.footer}`.toUpperCase(), cx, H - py - 60);
+  ctx.fillText(`${appName} · ${q.footer}`.toUpperCase(), cx, H - py - 60);
   ls.letterSpacing = "0px";
 
   return canvas.toDataURL("image/png");
@@ -216,6 +215,8 @@ export function QrCodeDialog({
   hasPin: boolean;
   fileBase: string;
 }) {
+  const t = useT();
+  const q = t.qr;
   const [open, setOpen] = useState(false);
   const [pin, setPin] = useState("");
   const [cardUrl, setCardUrl] = useState<string | null>(null);
@@ -223,11 +224,11 @@ export function QrCodeDialog({
   const render = useCallback(async () => {
     setCardUrl(null);
     try {
-      setCardUrl(await buildCard(url, title, pin.trim()));
+      setCardUrl(await buildCard(url, title, pin.trim(), q, t.app.name));
     } catch (e) {
       console.error("QR card render failed", e);
     }
-  }, [url, title, pin]);
+  }, [url, title, pin, q, t.app.name]);
 
   // Rebuild the card when it opens and whenever the PIN changes (debounced).
   useEffect(() => {

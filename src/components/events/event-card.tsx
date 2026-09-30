@@ -3,11 +3,13 @@ import { CalendarDays, Images, Settings } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { formatEventDate, monogram, type EventRow } from "@/lib/events";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { intlLocale } from "@/lib/i18n";
+import { getLocale, getT } from "@/lib/i18n/server";
 
-export function EventCard({ event }: { event: EventRow }) {
+export async function EventCard({ event }: { event: EventRow }) {
+  const [t, locale] = await Promise.all([getT(), getLocale()]);
   const [first, second] = monogram(event.title);
-  const date = formatEventDate(event.event_date);
+  const date = formatEventDate(event.event_date, intlLocale[locale]);
 
   return (
     <article className="flex items-center gap-4 rounded-[1.75rem] bg-card p-4 shadow-sm sm:p-5">

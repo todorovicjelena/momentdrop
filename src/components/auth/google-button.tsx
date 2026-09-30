@@ -1,8 +1,11 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { loginWithGoogle } from "@/app/(auth)/actions";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 export function GoogleButton({ next }: { next?: string }) {
+  const t = useT();
   return (
     <form action={loginWithGoogle}>
       {next && <input type="hidden" name="next" value={next} />}

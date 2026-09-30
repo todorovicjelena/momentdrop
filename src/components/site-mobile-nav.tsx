@@ -3,19 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
-
-const LINKS = [
-  { href: "/#kako-funkcionise", label: () => t.marketing.nav.howItWorks },
-  { href: "/#cenovnik", label: () => t.marketing.nav.pricing },
-  { href: "/#faq", label: () => t.marketing.nav.faq },
-];
+import { useT } from "@/components/i18n-provider";
 
 // Hamburger menu for the home page header nav — only shown below md, where
 // the inline "Kako funkcioniše · Cenovnik · Pitanja" row doesn't fit.
 // The icon itself morphs into an X; slides in from the right over a
 // transparent, blurred backdrop.
 export function SiteMobileNav() {
+  const t = useT();
+  const LINKS = [
+    { href: "/#kako-funkcionise", label: t.marketing.nav.howItWorks },
+    { href: "/#cenovnik", label: t.marketing.nav.pricing },
+    { href: "/#faq", label: t.marketing.nav.faq },
+  ];
   const [open, setOpen] = useState(false);
 
   return (
@@ -73,7 +73,7 @@ export function SiteMobileNav() {
             onClick={() => setOpen(false)}
             className="rounded-2xl px-4 py-3 text-base font-semibold transition hover:bg-lilac-soft"
           >
-            {label()}
+            {label}
           </Link>
         ))}
       </div>

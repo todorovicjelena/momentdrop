@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 type ConfirmOptions = {
   title: string;
@@ -31,6 +31,7 @@ const ConfirmContext = createContext<Confirm | null>(null);
 //   const confirm = useConfirm();
 //   if (await confirm({ title: "Obrisati?" })) { … }
 export function ConfirmProvider({ children }: { children: React.ReactNode }) {
+  const t = useT();
   // `open` drives the animation; `options` outlives it so the dialog still has
   // its text while it fades out, instead of emptying mid-animation.
   const [options, setOptions] = useState<ConfirmOptions | null>(null);

@@ -9,13 +9,14 @@ import {
 } from "@/app/dashboard/events/[id]/actions";
 import { putWithProgress } from "@/lib/upload-client";
 import { BRANDING, type BrandingKind } from "@/lib/events";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 type Status = "idle" | "working";
 
 // Logo / cover upload: compress in the browser → get a presigned URL →
 // PUT straight to R2 (with progress) → tell the server to save the key.
 export function useBrandingUpload(eventId: string, kind: BrandingKind, initialUrl: string | null) {
+  const t = useT();
   const [previewUrl, setPreviewUrl] = useState(initialUrl);
   const [status, setStatus] = useState<Status>("idle");
   const [progress, setProgress] = useState(0);

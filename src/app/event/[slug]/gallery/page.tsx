@@ -4,18 +4,18 @@ import { Lock } from "lucide-react";
 import { GuestGallery } from "@/components/guest/guest-gallery";
 import { GuestNotice, GuestShell } from "@/components/guest/guest-shell";
 import { getPublicEvent } from "@/lib/public-event";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export async function generateMetadata({ params }: PageProps<"/event/[slug]/gallery">): Promise<Metadata> {
   const { slug } = await params;
-  const event = await getPublicEvent(slug);
+  const [event, t] = await Promise.all([getPublicEvent(slug), getT()]);
   return { title: event ? `${t.guest.galleryTitle} · ${event.title}` : t.guest.notFoundTitle, robots: { index: false } };
 }
 
 // Gallery for guests — only exists when the host turned on "Gosti vide galeriju".
 export default async function GuestGalleryPage({ params }: PageProps<"/event/[slug]/gallery">) {
   const { slug } = await params;
-  const event = await getPublicEvent(slug);
+  const [event, t] = await Promise.all([getPublicEvent(slug), getT()]);
   if (!event) notFound();
 
   return (

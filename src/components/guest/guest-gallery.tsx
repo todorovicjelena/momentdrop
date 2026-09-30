@@ -8,13 +8,12 @@ import { FormError, FormField } from "@/components/form-field";
 import { GalleryGrid } from "@/components/gallery/gallery-grid";
 import { deleteMyUpload, listGuestGallery, type GuestGalleryItem } from "@/app/event/[slug]/actions";
 import { guestToken, useStoredValue } from "@/hooks/use-stored-value";
-import { t } from "@/lib/i18n";
-
-const g = t.guest;
+import { useT } from "@/components/i18n-provider";
 
 // Loads through a Server Action because the PIN (if any) lives in this
 // browser's sessionStorage, which the server can't read during render.
 export function GuestGallery({ slug, hasPin }: { slug: string; hasPin: boolean }) {
+  const g = useT().guest;
   const [pin, setPin] = useStoredValue("session", `momentdrop:pin:${slug}`);
   const [items, setItems] = useState<GuestGalleryItem[] | null>(null);
   const [error, setError] = useState<string>();
@@ -36,7 +35,7 @@ export function GuestGallery({ slug, hasPin }: { slug: string; hasPin: boolean }
     return () => {
       cancelled = true;
     };
-  }, [slug, pin, needsPin, setPin]);
+  }, [slug, pin, needsPin, setPin, g]);
 
   if (needsPin) {
     return (

@@ -3,11 +3,14 @@ import { requireUser } from "@/lib/auth";
 import { getOrigin } from "@/lib/origin";
 import { EventForm } from "@/components/events/event-form";
 import { PageTransition } from "@/components/page-transition";
-import { t } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: t.newEvent.title };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT()).newEvent.title };
+}
 
 export default async function NewEventPage() {
+  const t = await getT();
   await requireUser("/dashboard/new");
   const host = (await getOrigin()).replace(/^https?:\/\//, "");
 

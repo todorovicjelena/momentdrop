@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Download, Trash2, X } from "lucide-react";
 import type { GalleryItem } from "./gallery-grid";
 import { useClosing, useModal } from "@/hooks/use-modal";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n-provider";
 
 // Full-screen viewer: photos and videos play in the page instead of opening
 // the raw file (browsers download .mov files they're asked to open directly).
@@ -27,6 +27,7 @@ export function Lightbox({
   onSave?: (item: GalleryItem) => void;
   subtitle: (item: GalleryItem) => string;
 }) {
+  const t = useT();
   const item = items[index];
   const touchX = useRef<number | null>(null);
   const hasPrev = index > 0;
