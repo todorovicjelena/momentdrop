@@ -161,6 +161,8 @@ export const sr = {
   scavengerHunt: {
     title: "Foto lov na blago",
     hint: "Pošaljite sliku za svaki zadatak i čekirajte ga - što više, to bolje!",
+    attach: "Pošalji sliku za ovaj zadatak",
+    needName: "Prvo unesite svoje ime gore, pa se vratite ovde.",
     prompts: {
       wedding: [
         "Slika sa mladencima",
@@ -288,6 +290,8 @@ export const sr = {
     noneForGuest: "Nema fajlova od ove osobe.",
     showCompact: "Prikaži sitnije sličice",
     showNormal: "Prikaži veće sličice",
+    allPrompts: "Svi zadaci",
+    filterByPrompt: "Filtriraj po zadatku",
     download: "Preuzmi",
     delete: "Obriši",
     confirmDelete: "Obrisati ovaj fajl?",

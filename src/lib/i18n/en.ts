@@ -149,6 +149,8 @@ export const en = {
   scavengerHunt: {
     title: "Photo scavenger hunt",
     hint: "Send a photo for each prompt and check it off - the more, the better!",
+    attach: "Send a photo for this prompt",
+    needName: "Enter your name above first, then come back here.",
     prompts: {
       wedding: [
         "A photo with the newlyweds",
@@ -276,6 +278,8 @@ export const en = {
     noneForGuest: "No files from this person.",
     showCompact: "Show smaller thumbnails",
     showNormal: "Show larger thumbnails",
+    allPrompts: "All prompts",
+    filterByPrompt: "Filter by prompt",
     download: "Download",
     delete: "Delete",
     confirmDelete: "Delete this file?",

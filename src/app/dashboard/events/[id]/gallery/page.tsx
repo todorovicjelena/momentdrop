@@ -22,6 +22,7 @@ type UploadRow = {
   file_type: FileKind;
   mime_type: string;
   created_at: string;
+  hunt_prompt_index: number | null;
 };
 
 const FILTERS = ["all", "image", "video", "audio"] as const;
@@ -38,7 +39,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
   // RLS: only uploads of your own events come back.
   const { data: uploads } = await supabase
     .from("uploads")
-    .select("id, guest_name, r2_key, file_type, mime_type, created_at")
+    .select("id, guest_name, r2_key, file_type, mime_type, created_at, hunt_prompt_index")
     .eq("event_id", id)
     .order("created_at", { ascending: false })
     .overrideTypes<UploadRow[], { merge: false }>();
@@ -51,6 +52,8 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
     audio: all.filter((u) => u.file_type === "audio").length,
   };
   const shown = filter === "all" ? all : all.filter((u) => u.file_type === filter);
+
+  const huntPrompts = t.scavengerHunt.prompts[event.event_type];
 
   // Short-lived signed links: one to view, one that downloads with a readable name.
   const items: GalleryItem[] = await Promise.all(
@@ -66,6 +69,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
         downloadUrl,
         fileName: name,
         canDelete: true,
+        huntPrompt: u.hunt_prompt_index !== null ? huntPrompts[u.hunt_prompt_index] : undefined,
       };
     }),
   );

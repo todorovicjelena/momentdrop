@@ -21,6 +21,7 @@ export type UploadItem = {
   error?: string;
   retryable?: boolean; // false for problems a retry can't fix (wrong type, too big…)
   uploadId?: string; // set once saved — lets the guest delete it again
+  huntPromptIndex?: number; // which scavenger-hunt prompt this was sent for, if any
 };
 
 // Weak signal at venues: 2 parallel uploads is a good balance.
@@ -156,6 +157,7 @@ export function useGuestUploads(slug: string) {
           mime,
           ...dims,
           durationSeconds,
+          huntPromptIndex: item.huntPromptIndex,
         });
         if (!saved.ok) return fail(saved.error);
         update(item.id, { status: "done", progress: 100, uploadId: saved.id });
@@ -184,7 +186,7 @@ export function useGuestUploads(slug: string) {
   }, [pump]);
 
   const addFiles = useCallback(
-    (files: FileList | File[], identity: Identity) => {
+    (files: FileList | File[], identity: Identity, huntPromptIndex?: number) => {
       identityRef.current = identity;
       const added = Array.from(files).map((file): UploadItem => {
         const id = crypto.randomUUID();
@@ -205,6 +207,7 @@ export function useGuestUploads(slug: string) {
           progress: 0,
           error,
           retryable: error ? false : undefined,
+          huntPromptIndex,
         };
       });
       const rejected = added.filter((it) => it.status === "error").length;

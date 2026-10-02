@@ -102,6 +102,7 @@ type ConfirmInput = {
   width?: number;
   height?: number;
   durationSeconds?: number;
+  huntPromptIndex?: number; // which scavenger-hunt prompt this was sent for, if any
 };
 
 export async function confirmGuestUpload(slug: string, input: ConfirmInput): Promise<ActionResult<{ id: string }>> {
@@ -109,6 +110,7 @@ export async function confirmGuestUpload(slug: string, input: ConfirmInput): Pro
   const kind = fileKind(input.mime);
   const guestName = input.guestName.trim().slice(0, GUEST_NAME_MAX);
   if (!kind || !guestName || !UUID.test(input.guestToken)) return { ok: false, error: errors.failed };
+  const huntPromptIndex = Number.isInteger(input.huntPromptIndex) && input.huntPromptIndex! >= 0 && input.huntPromptIndex! < 20 ? input.huntPromptIndex : null;
 
   const event = await openEvent(slug, input.pin);
   if (!event.ok) return event;
@@ -139,6 +141,7 @@ export async function confirmGuestUpload(slug: string, input: ConfirmInput): Pro
     width: int(input.width),
     height: int(input.height),
     duration_seconds: (kind === "video" || kind === "audio") && input.durationSeconds ? Math.min(input.durationSeconds, 9999) : null,
+    hunt_prompt_index: huntPromptIndex,
   }).select("id").single();
 
   if (row) return { ok: true, id: row.id };

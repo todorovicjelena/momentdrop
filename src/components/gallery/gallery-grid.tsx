@@ -24,6 +24,7 @@ import { intlLocale } from "@/lib/i18n";
 import { useLocale, useT } from "@/components/i18n-provider";
 
 const ALL_GUESTS = "all";
+const ALL_PROMPTS = "all";
 
 export type GalleryItem = {
   id: string;
@@ -34,6 +35,7 @@ export type GalleryItem = {
   downloadUrl: string;
   fileName: string; // name inside the ZIP
   canDelete?: boolean;
+  huntPrompt?: string; // scavenger-hunt prompt this was sent for, already resolved to text
 };
 
 // How long a tile's shrink-and-fade runs before it's removed from the list.
@@ -85,7 +87,15 @@ export function GalleryGrid({
   // friend's) in an album that quickly grows past a comfortable scroll.
   const [guestFilter, setGuestFilter] = useState<string>(ALL_GUESTS);
   const guestNames = [...new Set(items.map((it) => it.guestName))].sort((a, b) => a.localeCompare(b, intlLocale[locale]));
-  const visible = guestFilter === ALL_GUESTS ? afterDelete : afterDelete.filter((it) => it.guestName === guestFilter);
+
+  // Which scavenger-hunt prompt (if any) a photo was tagged for — lets the
+  // host pull up "every silly-face photo" instead of scrolling the whole album.
+  const [promptFilter, setPromptFilter] = useState<string>(ALL_PROMPTS);
+  const prompts = [...new Set(items.flatMap((it) => (it.huntPrompt ? [it.huntPrompt] : [])))];
+
+  const visible = afterDelete
+    .filter((it) => guestFilter === ALL_GUESTS || it.guestName === guestFilter)
+    .filter((it) => promptFilter === ALL_PROMPTS || it.huntPrompt === promptFilter);
 
   // More, smaller tiles so a guest can skim a big album faster.
   const [compact, setCompact] = useState(false);
@@ -235,6 +245,27 @@ export function GalleryGrid({
             <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           </div>
         )}
+        {prompts.length > 1 && (
+          <div className="relative">
+            <select
+              value={promptFilter}
+              onChange={(e) => {
+                setPromptFilter(e.target.value);
+                setSelected(new Set());
+              }}
+              aria-label={t.gallery.filterByPrompt}
+              className="h-9 max-w-[12rem] appearance-none rounded-full border-2 border-input bg-card py-1 pr-9 pl-3.5 text-sm font-semibold text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <option value={ALL_PROMPTS}>{t.gallery.allPrompts}</option>
+              {prompts.map((prompt) => (
+                <option key={prompt} value={prompt}>
+                  {prompt}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+          </div>
+        )}
         <button
           type="button"
           onClick={() => setCompact((c) => !c)}
@@ -370,6 +401,11 @@ export function GalleryGrid({
                 )}
               >
                 <div className="min-w-0">
+                  {!compact && item.huntPrompt && (
+                    <p className="mb-1 inline-block truncate rounded-full bg-primary/90 px-2 py-0.5 text-[11px] font-semibold">
+                      {item.huntPrompt}
+                    </p>
+                  )}
                   <p className="truncate text-sm font-semibold">{item.guestName}</p>
                   {/* Dropped at this density — name + two buttons won't fit a
                       tile this narrow, so full details live in the viewer. */}
