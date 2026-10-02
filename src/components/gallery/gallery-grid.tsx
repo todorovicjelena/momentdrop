@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- presigned R2 URLs, not optimizable by next/image */
 import { useOptimistic, useRef, useState, useTransition } from "react";
-import { Check, CheckSquare, Download, Loader2, Mic, Pause, Play, Trash2, X } from "lucide-react";
+import { Check, CheckSquare, ChevronDown, Download, Loader2, Mic, Pause, Play, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/confirm-provider";
@@ -16,11 +16,14 @@ import {
   type MediaRef,
 } from "@/lib/download";
 import type { FileKind } from "@/lib/uploads";
+import { slugify } from "@/lib/events";
 import { cn } from "@/lib/utils";
 import type { ActionResult } from "@/lib/result";
 import { Lightbox } from "./lightbox";
 import { intlLocale } from "@/lib/i18n";
 import { useLocale, useT } from "@/components/i18n-provider";
+
+const ALL_GUESTS = "all";
 
 export type GalleryItem = {
   id: string;
@@ -65,7 +68,7 @@ export function GalleryGrid({
   });
   const confirm = useConfirm();
   // Hide deleted tiles immediately; the server refresh confirms it.
-  const [visible, removeOptimistic] = useOptimistic(items, (state, ids: string[]) =>
+  const [afterDelete, removeOptimistic] = useOptimistic(items, (state, ids: string[]) =>
     state.filter((it) => !ids.includes(it.id)),
   );
   const [, startTransition] = useTransition();
@@ -77,6 +80,12 @@ export function GalleryGrid({
   const busy = saveProgress !== null;
   // Tiles on their way out: they shrink and fade before leaving the list.
   const [removing, setRemoving] = useState<Set<string>>(new Set());
+
+  // Who sent something — so a guest can find just their own uploads (or one
+  // friend's) in an album that quickly grows past a comfortable scroll.
+  const [guestFilter, setGuestFilter] = useState<string>(ALL_GUESTS);
+  const guestNames = [...new Set(items.map((it) => it.guestName))].sort((a, b) => a.localeCompare(b, intlLocale[locale]));
+  const visible = guestFilter === ALL_GUESTS ? afterDelete : afterDelete.filter((it) => it.guestName === guestFilter);
 
   function deleteMany(ids: string[]) {
     if (!onDelete || ids.length === 0) return;
@@ -135,6 +144,10 @@ export function GalleryGrid({
     triggerDownload(item.downloadUrl, item.fileName);
   }
 
+  // Named after whoever's currently filtered in, so "download all" while
+  // viewing just one guest's uploads doesn't ship a ZIP named for everyone.
+  const effectiveZipName = guestFilter === ALL_GUESTS ? zipName : `${zipName.replace(/\.zip$/i, "")}-${slugify(guestFilter) || "guest"}.zip`;
+
   // Toolbar "download all / selected". Computer → one ZIP. Phone → share to Photos
   // (a handful at a time) or, for a big set, guide the guest through saving one by one.
   async function save(list: GalleryItem[]) {
@@ -142,7 +155,7 @@ export function GalleryGrid({
 
     if (!isMobile()) {
       try {
-        const result = await downloadZipFile(list.map(toRef), zipName, (done, total) =>
+        const result = await downloadZipFile(list.map(toRef), effectiveZipName, (done, total) =>
           setSaveProgress(t.gallery.zipping(done, total)),
         );
         if (result === "saved") toast.success(t.gallery.zipReady);
@@ -198,6 +211,27 @@ export function GalleryGrid({
     <div className="flex flex-col gap-5">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
+        {guestNames.length > 1 && (
+          <div className="relative">
+            <select
+              value={guestFilter}
+              onChange={(e) => {
+                setGuestFilter(e.target.value);
+                setSelected(new Set());
+              }}
+              aria-label={t.gallery.filterByGuest}
+              className="h-9 appearance-none rounded-full border-2 border-input bg-card py-1 pr-9 pl-3.5 text-sm font-semibold text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <option value={ALL_GUESTS}>{t.gallery.allGuests}</option>
+              {guestNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+          </div>
+        )}
         {saveProgress && (
           <span className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm">
             <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -263,6 +297,9 @@ export function GalleryGrid({
         )}
       </div>
 
+      {visible.length === 0 && afterDelete.length > 0 ? (
+        <p className="rounded-2xl bg-card px-4 py-8 text-center text-muted-foreground shadow-sm">{t.gallery.noneForGuest}</p>
+      ) : (
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {visible.map((item, index) => {
           const isSelected = selected.has(item.id);
@@ -347,6 +384,7 @@ export function GalleryGrid({
           );
         })}
       </ul>
+      )}
 
       {openIndex !== null && (
         <Lightbox
