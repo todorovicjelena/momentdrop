@@ -244,6 +244,8 @@ export const sr = {
     allGuests: "Svi gosti",
     filterByGuest: "Filtriraj po gostu",
     noneForGuest: "Nema fajlova od ove osobe.",
+    showCompact: "Prikaži sitnije sličice",
+    showNormal: "Prikaži veće sličice",
     download: "Preuzmi",
     delete: "Obriši",
     confirmDelete: "Obrisati ovaj fajl?",

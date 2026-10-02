@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- presigned R2 URLs, not optimizable by next/image */
 import { useOptimistic, useRef, useState, useTransition } from "react";
-import { Check, CheckSquare, ChevronDown, Download, Loader2, Mic, Pause, Play, Trash2, X } from "lucide-react";
+import { Check, CheckSquare, ChevronDown, Download, Grid2x2, Grid3x3, Loader2, Mic, Pause, Play, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/confirm-provider";
@@ -86,6 +86,9 @@ export function GalleryGrid({
   const [guestFilter, setGuestFilter] = useState<string>(ALL_GUESTS);
   const guestNames = [...new Set(items.map((it) => it.guestName))].sort((a, b) => a.localeCompare(b, intlLocale[locale]));
   const visible = guestFilter === ALL_GUESTS ? afterDelete : afterDelete.filter((it) => it.guestName === guestFilter);
+
+  // More, smaller tiles so a guest can skim a big album faster.
+  const [compact, setCompact] = useState(false);
 
   function deleteMany(ids: string[]) {
     if (!onDelete || ids.length === 0) return;
@@ -232,6 +235,16 @@ export function GalleryGrid({
             <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           </div>
         )}
+        <button
+          type="button"
+          onClick={() => setCompact((c) => !c)}
+          aria-pressed={compact}
+          aria-label={compact ? t.gallery.showNormal : t.gallery.showCompact}
+          title={compact ? t.gallery.showNormal : t.gallery.showCompact}
+          className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-input bg-card text-foreground transition hover:bg-muted"
+        >
+          {compact ? <Grid2x2 className="size-4" aria-hidden /> : <Grid3x3 className="size-4" aria-hidden />}
+        </button>
         {saveProgress && (
           <span className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm">
             <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -300,7 +313,7 @@ export function GalleryGrid({
       {visible.length === 0 && afterDelete.length > 0 ? (
         <p className="rounded-2xl bg-card px-4 py-8 text-center text-muted-foreground shadow-sm">{t.gallery.noneForGuest}</p>
       ) : (
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <ul className={compact ? "grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6" : "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"}>
         {visible.map((item, index) => {
           const isSelected = selected.has(item.id);
           return (
@@ -350,12 +363,19 @@ export function GalleryGrid({
                 )}
               </button>
 
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent px-3 pt-12 pb-3 text-cream sm:px-4 sm:pb-4">
+              <div
+                className={cn(
+                  "pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent text-cream",
+                  compact ? "px-2 pt-6 pb-1.5" : "px-3 pt-12 pb-3 sm:px-4 sm:pb-4",
+                )}
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold">{item.guestName}</p>
-                  <p className="text-xs opacity-80">{timeFormat.format(new Date(item.createdAt))}</p>
+                  {/* Dropped at this density — name + two buttons won't fit a
+                      tile this narrow, so full details live in the viewer. */}
+                  {!compact && <p className="text-xs opacity-80">{timeFormat.format(new Date(item.createdAt))}</p>}
                 </div>
-                {!selecting && (
+                {!selecting && !compact && (
                   <div className="pointer-events-auto flex shrink-0 gap-1.5">
                     <button
                       type="button"

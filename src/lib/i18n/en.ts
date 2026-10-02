@@ -232,6 +232,8 @@ export const en = {
     allGuests: "All guests",
     filterByGuest: "Filter by guest",
     noneForGuest: "No files from this person.",
+    showCompact: "Show smaller thumbnails",
+    showNormal: "Show larger thumbnails",
     download: "Download",
     delete: "Delete",
     confirmDelete: "Delete this file?",
