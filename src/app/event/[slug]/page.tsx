@@ -5,6 +5,7 @@ import { CalendarDays, Lock } from "lucide-react";
 import { DancingFlowers } from "@/components/dancing-flowers";
 import { GuestUploader } from "@/components/guest/guest-uploader";
 import { GuestNotice, GuestShell } from "@/components/guest/guest-shell";
+import { ScavengerHunt } from "@/components/guest/scavenger-hunt";
 import { getPublicEvent } from "@/lib/public-event";
 import { formatEventDate, isUploadClosed } from "@/lib/events";
 import { intlLocale } from "@/lib/i18n";
@@ -61,6 +62,8 @@ export default async function GuestEventPage({ params }: PageProps<"/event/[slug
           )}
         </div>
       </div>
+
+      {!isUploadClosed(event) && <ScavengerHunt slug={event.slug} eventType={event.event_type} />}
     </GuestShell>
   );
 }
