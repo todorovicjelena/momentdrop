@@ -397,7 +397,7 @@ export function GalleryGrid({
               <div
                 className={cn(
                   "pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent text-cream",
-                  compact ? "px-2 pt-6 pb-1.5" : "px-3 pt-12 pb-3 sm:px-4 sm:pb-4",
+                  compact ? "px-3 pt-6 pb-1.5" : "px-3 pt-12 pb-3 sm:px-4 sm:pb-4",
                 )}
               >
                 <div className="min-w-0">
