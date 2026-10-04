@@ -75,19 +75,40 @@ async function imageSize(blob: Blob) {
   }
 }
 
-// Resize big photos in the browser (saves the guest's mobile data). HEIC can't be
-// decoded by most browsers, so it's uploaded as-is.
-async function prepareImage(file: File, mime: string): Promise<File | Blob> {
-  if (mime === "image/heic" || mime === "image/heif") return file;
+// Resize big photos in the browser (saves the guest's mobile data), and
+// convert HEIC/HEIF (iPhone's default format) to JPEG first — most browsers
+// can't decode HEIC in an <img>, so an unconverted one looks "broken" to
+// anyone viewing the gallery on Chrome/Firefox/Android/Windows.
+async function prepareImage(file: File, mime: string): Promise<{ blob: File | Blob; mime: string }> {
+  let input: File = file;
+  let outMime = mime;
+
+  if (mime === "image/heic" || mime === "image/heif") {
+    try {
+      // Dynamically imported: the package touches `window` at module-load
+      // time, which crashes the server-side render Next.js still does for
+      // this "use client" component before hydration.
+      const { default: heic2any } = await import("heic2any");
+      const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
+      const convertedBlob = Array.isArray(converted) ? converted[0] : converted;
+      input = new File([convertedBlob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
+      outMime = "image/jpeg";
+    } catch (e) {
+      console.error("HEIC conversion failed, uploading original", e);
+      return { blob: file, mime }; // worst case: same as before this fix
+    }
+  }
+
   try {
-    return await imageCompression(file, {
+    const compressed = await imageCompression(input, {
       maxWidthOrHeight: UPLOAD_LIMITS.imageMaxDimension,
       initialQuality: UPLOAD_LIMITS.imageQuality,
       maxSizeMB: 4,
       useWebWorker: true,
     });
+    return { blob: compressed, mime: outMime };
   } catch {
-    return file;
+    return { blob: input, mime: outMime };
   }
 }
 
@@ -115,7 +136,7 @@ export function useGuestUploads(slug: string) {
       const { guestName, pin } = identityRef.current;
       const fail = (error: string, retryable = true) => update(item.id, { status: "error", error, retryable });
 
-      const mime = mimeOf(file);
+      let mime = mimeOf(file);
       const kind = fileKind(mime);
       if (!kind) return fail(errors.fileType(fileExtension(file.name)), false);
 
@@ -135,7 +156,9 @@ export function useGuestUploads(slug: string) {
           return fail(errors.audioTooLong(durationSeconds), false);
         }
       } else {
-        body = await prepareImage(file, mime);
+        const prepared = await prepareImage(file, mime);
+        body = prepared.blob;
+        mime = prepared.mime;
         dims = await imageSize(body);
       }
       if (body.size > maxBytes(kind)) return fail(errors.tooBig(toMb(body.size), kind, maxMb(kind)), false);

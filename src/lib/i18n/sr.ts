@@ -163,6 +163,8 @@ export const sr = {
     hint: "Pošaljite sliku za svaki zadatak i čekirajte ga - što više, to bolje!",
     attach: "Pošalji sliku za ovaj zadatak",
     needName: "Prvo unesite svoje ime gore, pa se vratite ovde.",
+    sent: (prompt: string) => `Poslato za "${prompt}" ✓`,
+    sendFailed: "Slanje nije uspelo. Pokušajte ponovo.",
     prompts: {
       wedding: [
         "Slika sa mladencima",

@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Camera, Check, ChevronDown, Loader2, Target } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { Camera, Check, ChevronDown, Images, Loader2, Target } from "lucide-react";
 import { toast } from "sonner";
 import { useStoredValue } from "@/hooks/use-stored-value";
 import { useGuestUploads } from "@/hooks/use-guest-uploads";
 import { useT } from "@/components/i18n-provider";
 import type { EventType } from "@/lib/events";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // A checklist of fun photo prompts, each with its own attach button - picking
@@ -15,8 +17,9 @@ import { cn } from "@/lib/utils";
 // the gallery down to "every silly-face photo" instead of scrolling the
 // whole album. A manual checkbox still exists alongside it (toggleable on
 // its own) for guests who'd rather just self-report without re-uploading.
-export function ScavengerHunt({ slug, eventType }: { slug: string; eventType: EventType }) {
-  const t = useT().scavengerHunt;
+export function ScavengerHunt({ slug, eventType, guestsCanView }: { slug: string; eventType: EventType; guestsCanView: boolean }) {
+  const messages = useT();
+  const t = messages.scavengerHunt;
   const prompts = t.prompts[eventType];
   const [open, setOpen] = useState(false);
   const [checkedRaw, setCheckedRaw] = useStoredValue("local", `momentdrop:hunt:${slug}`);
@@ -26,6 +29,8 @@ export function ScavengerHunt({ slug, eventType }: { slug: string; eventType: Ev
   const [pin] = useStoredValue("session", `momentdrop:pin:${slug}`);
   const { items, addFiles } = useGuestUploads(slug);
   const inputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  // So a finished upload only toasts once, even though `items` keeps updating.
+  const announcedRef = useRef(new Set<string>());
 
   function setChecked(index: number, value: boolean) {
     const next = new Set(checked);
@@ -33,6 +38,23 @@ export function ScavengerHunt({ slug, eventType }: { slug: string; eventType: Ev
     else next.delete(index);
     setCheckedRaw([...next].join(","));
   }
+
+  // Confirms each hunt-tagged upload as it finishes - a silent checkbox isn't
+  // proof the photo actually made it to the gallery.
+  useEffect(() => {
+    for (const item of items) {
+      if (item.huntPromptIndex === undefined || announcedRef.current.has(item.id)) continue;
+      if (item.status === "done") {
+        announcedRef.current.add(item.id);
+        toast.success(t.sent(prompts[item.huntPromptIndex]));
+      } else if (item.status === "error") {
+        announcedRef.current.add(item.id);
+        setChecked(item.huntPromptIndex, false);
+        toast.error(t.sendFailed);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setChecked/prompts/t.sent are stable for a given render pass
+  }, [items]);
 
   function attach(index: number) {
     if (!guestName) return toast.info(t.needName);
@@ -115,6 +137,13 @@ export function ScavengerHunt({ slug, eventType }: { slug: string; eventType: Ev
               );
             })}
           </ul>
+
+          {guestsCanView && (
+            <Link href={`/event/${slug}/gallery`} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-3 w-full border-2")}>
+              <Images aria-hidden />
+              {messages.guest.viewGallery}
+            </Link>
+          )}
         </div>
       </div>
     </div>

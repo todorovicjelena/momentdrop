@@ -63,7 +63,9 @@ export default async function GuestEventPage({ params }: PageProps<"/event/[slug
         </div>
       </div>
 
-      {!isUploadClosed(event) && <ScavengerHunt slug={event.slug} eventType={event.event_type} />}
+      {!isUploadClosed(event) && (
+        <ScavengerHunt slug={event.slug} eventType={event.event_type} guestsCanView={event.guests_can_view} />
+      )}
     </GuestShell>
   );
 }

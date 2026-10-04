@@ -6,7 +6,7 @@ export const VIDEO_TYPES = ["video/mp4", "video/quicktime"] as const;
 export const AUDIO_TYPES = ["audio/webm", "audio/mp4", "audio/mpeg", "audio/ogg"] as const;
 
 export const UPLOAD_LIMITS = {
-  maxImageBytes: 30 * 1024 * 1024, // after compression; HEIC originals are uploaded as-is
+  maxImageBytes: 30 * 1024 * 1024, // after compression (HEIC/HEIF is converted to JPEG first)
   maxVideoBytes: 150 * 1024 * 1024,
   maxVideoSeconds: 60,
   maxAudioBytes: 20 * 1024 * 1024,

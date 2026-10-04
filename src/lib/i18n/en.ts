@@ -151,6 +151,8 @@ export const en = {
     hint: "Send a photo for each prompt and check it off - the more, the better!",
     attach: "Send a photo for this prompt",
     needName: "Enter your name above first, then come back here.",
+    sent: (prompt: string) => `Sent for "${prompt}" ✓`,
+    sendFailed: "Sending failed. Please try again.",
     prompts: {
       wedding: [
         "A photo with the newlyweds",
