@@ -35,7 +35,7 @@ export default async function DashboardPage() {
 
   return (
     <PageTransition>
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8">
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">{t.dashboard.greeting(displayName(claims))}</p>
