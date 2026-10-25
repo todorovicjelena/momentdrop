@@ -260,6 +260,16 @@ export const sr = {
       notFound: "Događaj nije pronađen.",
       checkoutFailed: "Plaćanje nije moglo da se pokrene. Pokušajte ponovo.",
       paidPlanRequired: "Puna pozadina je dostupna na Standard i Premium planu.",
+      deleteFailed: "Brisanje nije uspelo. Pokušajte ponovo.",
+    },
+    dangerZone: {
+      title: "Opasna zona",
+      deleteEvent: "Obriši događaj",
+      deleteHint: "Trajno briše događaj i sve poslate fotografije, video i audio snimke. Ovo ne može da se vrati.",
+      confirmTitle: "Obrisati ovaj događaj zauvek?",
+      confirmDescription: "Sve fotografije, video i audio snimci koje su gosti poslali biće trajno obrisani. Ovo ne može da se vrati.",
+      confirmButton: "Da, obriši zauvek",
+      deleting: "Brišem…",
     },
     plan: {
       title: "Plan",

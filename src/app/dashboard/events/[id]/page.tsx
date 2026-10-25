@@ -3,6 +3,7 @@ import { getOwnedEvent } from "@/lib/owned-event";
 import { presignGet } from "@/lib/r2";
 import { isoToLocalInput, type EventSettings } from "@/lib/events";
 import { SettingsForm } from "@/components/events/settings-form";
+import { DeleteEventSection } from "@/components/events/delete-event-section";
 import { PlanCard } from "@/components/events/plan-card";
 import { PageTransition } from "@/components/page-transition";
 import type { Plan } from "@/lib/plans";
@@ -59,6 +60,7 @@ export default async function EventSettingsPage({ params }: PageProps<"/dashboar
           background_url: backgroundUrl,
         }}
       />
+      <DeleteEventSection eventId={event.id} />
     </main>
     </PageTransition>
   );

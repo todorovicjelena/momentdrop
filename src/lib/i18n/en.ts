@@ -248,6 +248,16 @@ export const en = {
       notFound: "Event not found.",
       checkoutFailed: "Payment couldn't be started. Please try again.",
       paidPlanRequired: "The full background is available on the Standard and Premium plans.",
+      deleteFailed: "Delete failed. Please try again.",
+    },
+    dangerZone: {
+      title: "Danger zone",
+      deleteEvent: "Delete event",
+      deleteHint: "Permanently deletes the event and every photo, video, and audio message guests sent. This can't be undone.",
+      confirmTitle: "Delete this event forever?",
+      confirmDescription: "Every photo, video, and audio message guests sent will be permanently deleted. This can't be undone.",
+      confirmButton: "Yes, delete forever",
+      deleting: "Deleting…",
     },
     plan: {
       title: "Plan",

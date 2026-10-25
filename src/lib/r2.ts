@@ -1,6 +1,7 @@
 import "server-only";
 import {
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
@@ -49,4 +50,13 @@ export async function objectSize(key: string) {
 
 export async function deleteObject(key: string) {
   await s3.send(new DeleteObjectCommand({ Bucket, Key: key }));
+}
+
+// Whole-event cleanup can mean hundreds/thousands of keys — S3's batch delete
+// takes up to 1000 per call, so chunk rather than firing one request per file.
+export async function deleteObjects(keys: string[]) {
+  for (let i = 0; i < keys.length; i += 1000) {
+    const chunk = keys.slice(i, i + 1000);
+    await s3.send(new DeleteObjectsCommand({ Bucket, Delete: { Objects: chunk.map((Key) => ({ Key })), Quiet: true } }));
+  }
 }

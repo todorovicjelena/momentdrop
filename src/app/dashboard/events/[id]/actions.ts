@@ -2,9 +2,10 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { hashPin, PIN_PATTERN } from "@/lib/pin";
-import { deleteObject, objectSize, presignGet, presignPut } from "@/lib/r2";
+import { deleteObject, deleteObjects, objectSize, presignGet, presignPut } from "@/lib/r2";
 import {
   BRANDING,
   brandingKeyPrefix,
@@ -80,6 +81,47 @@ export async function updateEvent(eventId: string, _prev: SettingsState, formDat
   revalidatePath("/dashboard");
   revalidatePath(`/event/${current.slug}`);
   return { saved: true };
+}
+
+// ─── Delete event ────────────────────────────────────────────────────────────
+
+// Permanently removes the event: every guest file, every branding image, and
+// the event row itself (which cascades its `uploads` rows in the DB — but
+// cascading a DB row does nothing to the actual files sitting in R2, those
+// have to be deleted explicitly or they'd just sit there orphaned forever).
+export async function deleteEvent(eventId: string): Promise<ActionResult> {
+  const errors = (await getT()).settings.errors;
+  const { supabase } = await requireUser(`/dashboard/events/${eventId}`);
+
+  // RLS: comes back only if this event is yours.
+  const { data: event } = await supabase
+    .from("events")
+    .select("id, logo_key, cover_key, background_key")
+    .eq("id", eventId)
+    .maybeSingle();
+  if (!event) return { ok: false, error: errors.notFound };
+
+  // Page through uploads rather than one unbounded select — a deluxe event
+  // can hold thousands, past whatever row cap PostgREST enforces per request.
+  const uploadKeys: string[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data } = await supabase.from("uploads").select("r2_key").eq("event_id", eventId).range(from, from + 999);
+    if (!data || data.length === 0) break;
+    uploadKeys.push(...data.map((u) => u.r2_key));
+    if (data.length < 1000) break;
+  }
+
+  const brandingKeys = [event.logo_key, event.cover_key, event.background_key].filter((k): k is string => Boolean(k));
+  await deleteObjects([...uploadKeys, ...brandingKeys]).catch((e) => console.error("R2 cleanup failed:", e));
+
+  const { error } = await supabase.from("events").delete().eq("id", eventId);
+  if (error) {
+    console.error("deleteEvent failed:", error.code, error.message);
+    return { ok: false, error: errors.deleteFailed };
+  }
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
 }
 
 // ─── Logo & cover (browser uploads straight to R2) ──────────────────────────
