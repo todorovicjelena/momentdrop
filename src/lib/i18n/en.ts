@@ -254,7 +254,7 @@ export const en = {
       title: "Delete event",
       deleteEvent: "Delete",
       deleteHint: "Permanently deletes the event and every photo, video, and audio message guests sent. This can't be undone.",
-      confirmTitle: "Delete this event forever?",
+      confirmTitle: "Do you want to delete this event forever?",
       confirmDescription: "Every photo, video, and audio message guests sent will be permanently deleted. This can't be undone.",
       confirmButton: "Yes, delete forever",
       deleting: "Deleting…",

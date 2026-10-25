@@ -266,7 +266,7 @@ export const sr = {
       title: "Brisanje događaja",
       deleteEvent: "Obriši",
       deleteHint: "Trajno briše događaj i sve poslate fotografije, video i audio snimke. Ovo ne može da se vrati.",
-      confirmTitle: "Obrisati ovaj događaj zauvek?",
+      confirmTitle: "Da li želite da obrišete ovaj događaj zauvek?",
       confirmDescription: "Sve fotografije, video i audio snimci koje su gosti poslali biće trajno obrisani. Ovo ne može da se vrati.",
       confirmButton: "Da, obriši zauvek",
       deleting: "Brišem…",
