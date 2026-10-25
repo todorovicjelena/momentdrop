@@ -263,8 +263,8 @@ export const sr = {
       deleteFailed: "Brisanje nije uspelo. Pokušajte ponovo.",
     },
     dangerZone: {
-      title: "Opasna zona",
-      deleteEvent: "Obriši događaj",
+      title: "Brisanje događaja",
+      deleteEvent: "Obriši",
       deleteHint: "Trajno briše događaj i sve poslate fotografije, video i audio snimke. Ovo ne može da se vrati.",
       confirmTitle: "Obrisati ovaj događaj zauvek?",
       confirmDescription: "Sve fotografije, video i audio snimci koje su gosti poslali biće trajno obrisani. Ovo ne može da se vrati.",

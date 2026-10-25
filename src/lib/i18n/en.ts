@@ -251,8 +251,8 @@ export const en = {
       deleteFailed: "Delete failed. Please try again.",
     },
     dangerZone: {
-      title: "Danger zone",
-      deleteEvent: "Delete event",
+      title: "Delete event",
+      deleteEvent: "Delete",
       deleteHint: "Permanently deletes the event and every photo, video, and audio message guests sent. This can't be undone.",
       confirmTitle: "Delete this event forever?",
       confirmDescription: "Every photo, video, and audio message guests sent will be permanently deleted. This can't be undone.",
